@@ -1,0 +1,4 @@
+NUM_THREADS = 40
+STATION_CSV = "data.csv"
+EXAMPLE_RESULT_FILE = 'example_result.json'
+NUMBER_OF_STOPS = 11783
