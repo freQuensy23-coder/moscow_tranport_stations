@@ -1,4 +1,7 @@
 import requests as req
+import logging
+
+log = logging.getLogger("TransAPI")
 
 
 class TransAPI:
@@ -11,6 +14,8 @@ class TransAPI:
 
     def get_station_info(self, lon, lat) -> dict:
         link = self.get_link(lon, lat)
-        r = req.get(link)
+        r = self.requester.get(link)
         station_data = r.json()
+        log.debug(station_data)
+        log.info(f"Get information about station {station_data.get('name')}, ID: {station_data.get('id')}")
         return station_data
