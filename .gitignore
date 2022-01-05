@@ -152,5 +152,5 @@ cython_debug/
 .idea/
 
 # Database
-.db
-.db-journal
+*.db
+*.db-journal
