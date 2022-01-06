@@ -25,7 +25,7 @@ class Stop(BaseModel):
     name: str
     route_path: list[RotePath] = Field(alias="routePath")
 
-    def save(self, session: sqlalchemy.orm.Session, req_time: int = time(), commit=False):
+    def save(self, session: sqlalchemy.orm.Session, req_time: int = int(time()), commit=False):
         for path in self.route_path:
             for forecast in path.externalForecast:
                 p = Prediction(
