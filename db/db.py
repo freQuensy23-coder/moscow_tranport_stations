@@ -19,6 +19,7 @@ class Prediction(Base):
     byTelemetry = Column(Integer)
     tmId = Column(Integer)
     routePathId = Column(String)
+    request_time = Column(Integer)
 
 
 Base.metadata.create_all(engine)

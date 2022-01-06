@@ -38,7 +38,8 @@ class Stop(BaseModel):
                     forecast_time=forecast.time + req_time,
                     byTelemetry=forecast.byTelemetry,
                     tmId=forecast.tmId,
-                    routePathId=forecast.routePathId
+                    routePathId=forecast.routePathId,
+                    request_time=req_time
                 )
                 session.add(p)
         if commit:
