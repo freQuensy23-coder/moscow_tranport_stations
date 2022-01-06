@@ -9,6 +9,7 @@ from multiprocessing import Queue
 from logging import getLogger
 import logging
 from config import NUM_THREADS
+from datetime import datetime
 
 log = getLogger()
 logging.basicConfig(level=logging.DEBUG)
@@ -28,6 +29,8 @@ def thread_job():
 
 
 if __name__ == "__main__":
+    time_start = datetime.now()
+    log.info(f"Started at {time_start} with {NUM_THREADS} threads")
     api = TransAPI()
     stops_list = list(stops())
     stops = Queue()
@@ -46,4 +49,8 @@ if __name__ == "__main__":
         t.join()
         log.debug(f"Thread {t.name} finished")
 
+    time_req = datetime.now()
+    log.info(f"Перехожу к сохранению данных. Загрузка заняла {time_req - time_start}")
     session.commit()
+    time_save = datetime.now()
+    log.info(f"Отработал. Сохранение в бд заняло {time_save - time_req}. Общее время работы этого запуска: {time_save - time_start}")
