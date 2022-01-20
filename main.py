@@ -10,10 +10,14 @@ from logging import getLogger
 import logging
 from config import NUM_THREADS
 from datetime import datetime
+from cl_arguments import parser
 
 log = getLogger()
 logging.basicConfig(level=logging.DEBUG)
 session = sessionmaker(bind=engine)()
+
+args = parser.parse_args()
+log.debug(f"Command line args: {args}")
 
 
 def thread_job():
@@ -33,8 +37,12 @@ if __name__ == "__main__":
     log.info(f"Started at {time_start} with {NUM_THREADS} threads")
     api = TransAPI()
     stops_list = list(stops())
+
+    if args.number_stops != -1:
+        stops_list = stops_list[:args.number_stops]
+
     stops = Queue()
-    for stop in stops_list[:950]:
+    for stop in stops_list:
         coord = lon, lat = stop["Lon"], stop["Lat"]
         stops.put(coord)
 
@@ -53,4 +61,5 @@ if __name__ == "__main__":
     log.info(f"Перехожу к сохранению данных. Загрузка заняла {time_req - time_start}")
     session.commit()
     time_save = datetime.now()
-    log.info(f"Отработал. Сохранение в бд заняло {time_save - time_req}. Общее время работы этого запуска: {time_save - time_start}")
+    log.info(
+        f"Отработал. Сохранение в бд заняло {time_save - time_req}. Общее время работы этого запуска: {time_save - time_start}")
