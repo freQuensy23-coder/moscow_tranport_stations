@@ -13,7 +13,8 @@ from datetime import datetime
 from cl_arguments import parser
 
 log = getLogger()
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(filename="parser.log",
+                    format='%(asctime)s %(levelname)s %(message)s ', level=logging.DEBUG, filemode="w")
 session = sessionmaker(bind=engine)()
 
 args = parser.parse_args()
