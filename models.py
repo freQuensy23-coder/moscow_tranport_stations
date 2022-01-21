@@ -30,11 +30,7 @@ class Stop(BaseModel):
             for forecast in path.externalForecast:
                 p = Prediction(
                     stop_id=self.id_,
-                    stop_name=self.name,
                     route_path_id=path.id_,
-                    transport_type=path.transport_type,
-                    number=path.number,
-                    lastStopName=path.lastStopName,
                     forecast_time=forecast.time + req_time,
                     byTelemetry=forecast.byTelemetry,
                     tmId=forecast.tmId,
