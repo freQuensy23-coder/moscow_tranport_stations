@@ -10,11 +10,7 @@ class Prediction(Base):
     __tablename__ = "forecast"
     id = Column(Integer, primary_key=True)
     stop_id = Column(Integer)
-    stop_name = Column(String)
     route_path_id = Column(Integer)
-    transport_type = Column(String)
-    number = Column(String)
-    lastStopName = Column(String)
     forecast_time = Column(Integer)
     byTelemetry = Column(Integer)
     tmId = Column(Integer)
