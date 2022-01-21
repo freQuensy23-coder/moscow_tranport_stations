@@ -8,13 +8,13 @@ import threading
 from multiprocessing import Queue
 from logging import getLogger
 import logging
-from config import NUM_THREADS
+from config import NUM_THREADS, LEVEL
 from datetime import datetime
 from cl_arguments import parser
 
 log = getLogger()
 logging.basicConfig(filename="parser.log",
-                    format='%(asctime)s %(levelname)s %(message)s ', level=logging.DEBUG, filemode="w")
+                    format='%(asctime)s %(levelname)s %(message)s ', level=LEVEL, filemode="w")
 session = sessionmaker(bind=engine)()
 
 args = parser.parse_args()
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     NUM_THREADS = args.threads or NUM_THREADS
     NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS) # TODO Исправить баг с переизбытком потоков
-    log.debug(f"Creating {NUM_THREADS} threads")
+    log.info(f"Creating {NUM_THREADS} threads")
 
     threads = []
     for i in range(NUM_THREADS):
