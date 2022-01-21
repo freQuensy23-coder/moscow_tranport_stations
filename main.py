@@ -35,7 +35,7 @@ def thread_job():
 
 if __name__ == "__main__":
     time_start = datetime.now()
-    log.info(f"Started at {time_start} with {NUM_THREADS} threads")
+    log.info(f"Started at {time_start}.")
     api = TransAPI()
     stops_list = list(stops())
 
@@ -46,6 +46,10 @@ if __name__ == "__main__":
     for stop in stops_list:
         coord = lon, lat = stop["Lon"], stop["Lat"]
         stops.put(coord)
+
+    NUM_THREADS = args.threads or NUM_THREADS
+    NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS) # TODO Исправить баг с переизбытком потоков
+    log.debug(f"Creating {NUM_THREADS} threads")
 
     threads = []
     for i in range(NUM_THREADS):
