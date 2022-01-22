@@ -1,9 +1,16 @@
+about-time==3.1.1
+alive-progress==2.1.0
 certifi==2021.10.8
 charset-normalizer==2.0.10
+grapheme==0.6.0
 greenlet==1.1.2
 idna==3.3
+progress==1.6
+progressbar2==4.0.0
 pydantic==1.9.0
+python-utils==3.1.0
 requests==2.27.1
 SQLAlchemy==1.4.29
-typing_extensions==4.0.1
+tqdm==4.62.3
+typing-extensions==4.0.1
 urllib3==1.26.8
