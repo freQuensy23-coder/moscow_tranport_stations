@@ -1,4 +1,3 @@
-import requests
 from db.db import engine
 from models import Stop
 from station import stops
@@ -27,8 +26,10 @@ def thread_job():
         coord = stops.get()
         log.debug(f"Thread is working with {coord}")
         lon, lat = coord
-        stop = Stop.parse_obj(api.get_station_info(lon, lat))
-        stop.save(session, commit=False)
+        station_info = api.get_station_info(lon, lat)
+        log.debug(f"{station_info}")
+        stop = Stop.parse_obj(station_info)
+        stop.save_forecast(session, commit=False)
     log.debug("Thread finish working")
     return None
 
