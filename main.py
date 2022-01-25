@@ -37,6 +37,7 @@ def thread_job():
 if __name__ == "__main__":
     time_start = datetime.now()
     log.info(f"Started at {time_start}.")
+
     api = TransAPI()
     stops_list = list(stops())
 

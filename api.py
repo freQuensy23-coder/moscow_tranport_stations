@@ -3,7 +3,7 @@ import logging
 from random import randint
 
 log = logging.getLogger("TransAPI")
-headers = {'User-Agent': f'My User Agent 1.1', 'From': 'domain.com'}
+headers = {'sec-ch-ua': 'Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"', 'Host':'moscowtransport.app', 'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36'}
 
 
 class TransAPI:
@@ -12,7 +12,7 @@ class TransAPI:
 
     @staticmethod
     def get_link(lon, lat) -> str:
-        return f"https://moscowtransport.app/api/qr-stop/undefined/stop?p={lon}, {lat}"
+        return f"https://moscowtransport.app/api/qr-stop/1111/stop?p={lon}, {lat}"
 
     def get_station_info(self, lon, lat) -> dict:
         link = self.get_link(lon, lat)
