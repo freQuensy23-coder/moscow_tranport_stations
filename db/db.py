@@ -2,7 +2,9 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import create_engine
 
-engine = create_engine('sqlite:///db/forecast.db', echo=True)
+from db.db_config import PATH_TO_DB
+
+engine = create_engine(PATH_TO_DB, echo=True)
 Base = declarative_base()
 
 

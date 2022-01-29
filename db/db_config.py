@@ -1,0 +1,1 @@
+PATH_TO_DB = 'sqlite:///db/forecast.db'
