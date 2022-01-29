@@ -7,7 +7,7 @@ import threading
 from multiprocessing import Queue
 from logging import getLogger
 import logging
-from config import NUM_THREADS, LEVEL
+from config import NUM_THREADS, LEVEL, TIME_LIMIT
 from datetime import datetime
 from cl_arguments import parser
 from time_limit import time_limit, TimeoutException
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     stops_list = list(stops_coord())
 
     try:
-        with time_limit(10):
+        with time_limit(TIME_LIMIT):
             main()
     except TimeoutException as e:
         log.warning("TIME LIMIT")
