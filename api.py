@@ -19,5 +19,5 @@ class TransAPI:
         r = self.requester.get(link, headers=headers)
         station_data = r.json()
         log.debug(station_data)
-        log.info(f"Get information about station {station_data.get('name')}, ID: {station_data.get('id')}")
+        log.debug(f"Get information about station {station_data.get('name')}, ID: {station_data.get('id')}")
         return station_data
