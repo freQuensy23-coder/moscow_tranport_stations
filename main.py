@@ -1,6 +1,6 @@
 from db.db import engine
 from models import Stop
-from station import stops
+from station import stops as stops_coord
 from api import TransAPI
 from sqlalchemy.orm import sessionmaker
 import threading
@@ -10,6 +10,7 @@ import logging
 from config import NUM_THREADS, LEVEL
 from datetime import datetime
 from cl_arguments import parser
+from time_limit import time_limit, TimeoutException
 
 log = getLogger()
 logging.basicConfig(filename="parser.log",
@@ -34,13 +35,8 @@ def thread_job():
     return None
 
 
-if __name__ == "__main__":
-    time_start = datetime.now()
-    log.info(f"Started at {time_start}.")
-
-    api = TransAPI()
-    stops_list = list(stops())
-
+def main():
+    global stops_list, NUM_THREADS, stops
     if args.number_stops != -1:
         stops_list = stops_list[:args.number_stops]
 
@@ -50,7 +46,7 @@ if __name__ == "__main__":
         stops.put(coord)
 
     NUM_THREADS = args.threads or NUM_THREADS
-    NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS) # TODO Исправить баг с переизбытком потоков
+    NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS)  # TODO Исправить баг с переизбытком потоков
     log.info(f"Creating {NUM_THREADS} threads")
 
     threads = []
@@ -70,3 +66,18 @@ if __name__ == "__main__":
     time_save = datetime.now()
     log.info(
         f"Отработал. Сохранение в бд заняло {time_save - time_req}. Общее время работы этого запуска: {time_save - time_start}")
+
+
+if __name__ == "__main__":
+    time_start = datetime.now()
+    log.info(f"Started at {time_start}.")
+
+    api = TransAPI()
+    stops_list = list(stops_coord())
+
+    try:
+        with time_limit(10):
+            main()
+    except TimeoutException as e:
+        log.warning("TIME LIMIT")
+
