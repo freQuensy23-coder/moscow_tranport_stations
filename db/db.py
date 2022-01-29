@@ -2,7 +2,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import create_engine
 
-engine = create_engine('sqlite:///db/forecast.db', echo=True)
+engine = create_engine('sqlite:////home/frequensy/MosTransParser/moscow_tranport_stations/db/forecast.db', echo=True) # TODO fix abs path
 Base = declarative_base()
 
 
