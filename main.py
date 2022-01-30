@@ -7,18 +7,18 @@ import threading
 from multiprocessing import Queue
 from logging import getLogger
 import logging
-from config import NUM_THREADS, LEVEL, TIME_LIMIT
 from datetime import datetime
 from cl_arguments import parser
 from time_limit import time_limit, TimeoutException
 
 log = getLogger()
-logging.basicConfig(filename="parser.log",
-                    format='%(asctime)s %(levelname)s %(message)s ', level=LEVEL, filemode="w")
-session = sessionmaker(bind=engine)()
 
 args = parser.parse_args()
 log.debug(f"Command line args: {args}")
+
+logging.basicConfig(filename="parser.log", format='%(asctime)s %(levelname)s %(message)s ',
+                    level=args.loglevel, filemode="w")
+session = sessionmaker(bind=engine)()
 
 
 def thread_job():
@@ -45,7 +45,7 @@ def main():
         coord = lon, lat = stop["Lon"], stop["Lat"]
         stops.put(coord)
 
-    NUM_THREADS = args.threads or NUM_THREADS
+    NUM_THREADS = args.threads
     NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS)  # TODO Исправить баг с переизбытком потоков
     log.info(f"Creating {NUM_THREADS} threads")
 
@@ -73,10 +73,10 @@ if __name__ == "__main__":
     log.info(f"Started at {time_start}.")
 
     api = TransAPI()
-    stops_list = list(stops_coord())
+    stops_list = list(stops_coord(f_name=args.stations_csv))
 
     try:
-        with time_limit(TIME_LIMIT):
+        with time_limit(args.time_limit):
             main()
     except TimeoutException as e:
         log.warning("TIME LIMIT")
