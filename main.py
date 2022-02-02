@@ -1,7 +1,7 @@
 from db.db import engine
 from models import Stop
 from station import stops as stops_coord
-from api import TransAPI
+from api import TransAPI, FileProxyManager
 from sqlalchemy.orm import sessionmaker
 import threading
 from multiprocessing import Queue
@@ -10,6 +10,7 @@ import logging
 from datetime import datetime
 from cl_arguments import parser
 from time_limit import time_limit, TimeoutException
+from config import PROXIES_FILE
 
 log = getLogger()
 
@@ -72,7 +73,12 @@ if __name__ == "__main__":
     time_start = datetime.now()
     log.info(f"Started at {time_start}.")
 
-    api = TransAPI()
+    if args.proxy_file:
+        file_proxy = FileProxyManager(args.proxy_file or PROXIES_FILE)
+        api = TransAPI(file_proxy)
+    else:
+        api = TransAPI()
+
     stops_list = list(stops_coord(f_name=args.stations_csv))
 
     try:
