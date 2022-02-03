@@ -1,7 +1,7 @@
 from db.db import engine
 from models import Stop
 from station import stops as stops_coord
-from api import TransAPI, FileProxyManager
+from api import TransAPI, FileProxyManager, TorProxy
 from sqlalchemy.orm import sessionmaker
 import threading
 from multiprocessing import Queue
@@ -47,7 +47,7 @@ def main():
         stops.put(coord)
 
     NUM_THREADS = args.threads
-    NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS)  # TODO Исправить баг с переизбытком потоков
+    NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS)
     log.info(f"Creating {NUM_THREADS} threads")
 
     threads = []
@@ -76,6 +76,9 @@ if __name__ == "__main__":
     if args.proxy_file:
         file_proxy = FileProxyManager(args.proxy_file or PROXIES_FILE)
         api = TransAPI(file_proxy)
+    elif args.tor:
+        proxy = TorProxy()
+        api = TransAPI(proxy)
     else:
         api = TransAPI()
 

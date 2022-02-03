@@ -1,6 +1,7 @@
 import requests as req
 import logging
 from random import choice
+import socks, socket
 
 log = logging.getLogger("TransAPI")
 headers = {'sec-ch-ua': 'Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"', 'Host':'moscowtransport.app', 'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36'}
@@ -44,3 +45,12 @@ class FileProxyManager:
 
     def get_proxy(self):
         return choice(self._proxies)
+
+class TorProxy:
+    def __init__(self, port=9050, ip='127.0.0.1'):
+        socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5, ip, port)
+        socket.socket = socks.socksocket
+        self.proxy = {'https':'https://{ip}:{port}'}
+        
+    def get_proxy(self):
+        return self.proxy
