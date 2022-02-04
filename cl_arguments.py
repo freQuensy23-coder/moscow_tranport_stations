@@ -18,5 +18,7 @@ parser.add_argument('-tl', "--time_limit",
                     )
 parser.add_argument("--stations", help="csv file with station coords", type=str, dest="stations_csv",
                     default=config.STATION_CSV)
-parser.add_argument('--proxy', help='file with proxy data', type=str, dest="proxy_file", default=None)
+parser.add_argument('--proxy_file', help='file with proxy data', type=str, dest="proxy_file")
+parser.add_argument('--proxy', help='use proxy from config', action='store_const', dest="proxy_file",
+                    const=config.PROXIES_FILE)
 parser.add_argument('--tor', help='use_tor', action='store_true', dest='tor')

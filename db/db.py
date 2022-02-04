@@ -2,7 +2,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import create_engine
 
-from .db_config import PATH_TO_DB
+from config import PATH_TO_DB
 
 engine = create_engine(PATH_TO_DB, echo=True)
 Base = declarative_base()

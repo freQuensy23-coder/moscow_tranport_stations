@@ -10,7 +10,6 @@ import logging
 from datetime import datetime
 from cl_arguments import parser
 from time_limit import time_limit, TimeoutException
-from config import PROXIES_FILE
 
 log = getLogger()
 
@@ -43,7 +42,7 @@ def main():
 
     stops = Queue()
     for stop in stops_list:
-        coord = lon, lat = stop["Lon"], stop["Lat"]
+        coord = stop["Lon"], stop["Lat"]
         stops.put(coord)
 
     NUM_THREADS = args.threads
@@ -74,7 +73,7 @@ if __name__ == "__main__":
     log.info(f"Started at {time_start}.")
 
     if args.proxy_file:
-        file_proxy = FileProxyManager(args.proxy_file or PROXIES_FILE)
+        file_proxy = FileProxyManager(args.proxy_file)
         api = TransAPI(file_proxy)
     elif args.tor:
         proxy = TorProxy()
