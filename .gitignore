@@ -154,3 +154,6 @@ cython_debug/
 # Database
 *.db
 *.db-journal
+
+# Config
+config.py
