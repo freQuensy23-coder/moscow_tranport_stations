@@ -8,6 +8,7 @@ idna==3.3
 progress==1.6
 progressbar2==4.0.0
 pydantic==1.9.0
+PySocks==1.7.1
 python-utils==3.1.0
 requests==2.27.1
 SQLAlchemy==1.4.29

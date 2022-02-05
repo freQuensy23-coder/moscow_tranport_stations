@@ -1,20 +1,52 @@
 import logging
+import time
+from threading import Thread
+import progressbar
 from db.db import engine
 from models import Stop
 from station import stops
-from api import TransAPI
+from api import TransAPI, MosTransportBan, TorProxy
 from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 from logging import basicConfig
+from multiprocessing import Queue
+from utils import stops_list_to_queue
 
-api = TransAPI()
+proxy = TorProxy()
+api = TransAPI(proxy)
 session = sessionmaker(bind=engine)()
-stops_list = list(stops())
+stops_list = list(stops(f_name="data.csv"))
 basicConfig(level=logging.DEBUG, filemode="w", filename="load_stops.log")
+parsed_stops = 0
+max_stops = len(stops_list)
+queue = stops_list_to_queue(stops_list)
 
-for stop in tqdm(stops_list):
-    coord = lon, lat = stop["Lon"], stop["Lat"]
-    stop = Stop.parse_obj(api.get_station_info(lon, lat))
-    stop.save_stop(session)
 
-session.commit()
+def parse_stop():
+    global queue, session, parsed_stops
+    coord = lon, lat = queue.get()
+    stop = None
+    while stop is None:
+        try:
+            stop = Stop.parse_obj(api.get_station_info(lon, lat))
+        except MosTransportBan:
+            api.change_ip()
+    parsed_stops += 1
+    stop.save_stop(session, commit=False)
+    return stop
+
+
+threads = []
+N = 40
+for i in range(N):
+    t = Thread(name=f"{i}", target=parse_stop)
+    t.start()
+    threads.append(t)
+
+bar = progressbar.ProgressBar(max_value=max_stops)
+while parsed_stops < max_stops:
+    bar.update(parsed_stops)
+    time.sleep(1)
+
+for t in threads:
+    t.join()
