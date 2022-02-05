@@ -49,7 +49,8 @@ class FileProxyManager:
 
 class TorProxy:
     def __init__(self, port=9050, ip='127.0.0.1'):
-        self.proxy = {'https': 'https://{ip}:{port}'}
+        self.proxy = {'https': 'socks5://{ip}:{port}',
+                      'http': 'socks5://{ip}:{port}'}
 
     def get_proxy(self):
         return self.proxy
