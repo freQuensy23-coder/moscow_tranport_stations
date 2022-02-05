@@ -28,7 +28,6 @@ class Stop(BaseModel):
     lon: float
     lat: float
 
-
     def save_forecast(self, session: sqlalchemy.orm.Session, req_time: int = int(time()), commit=False):
         for path in self.route_path:
             for forecast in path.externalForecast:
@@ -39,9 +38,7 @@ class Stop(BaseModel):
                     byTelemetry=forecast.byTelemetry,
                     tmId=forecast.tmId,
                     routePathId=forecast.routePathId,
-                    request_time=req_time,
-                    lat=self.lat,
-                    lon=self.lon
+                    request_time=req_time
                 )
                 session.add(p)
         if commit:
@@ -55,7 +52,9 @@ class Stop(BaseModel):
                 route_path_id=r.id_,
                 transport_type=r.transport_type,
                 number=r.number,
-                last_stop_name=r.lastStopName
+                last_stop_name=r.lastStopName,
+                lat=self.lat,
+                lon=self.lon
             )
             session.add(s)
         if commit:
