@@ -1,7 +1,7 @@
 from db.db import engine
 from models import Stop
 from station import stops as stops_coord
-from api import TransAPI, FileProxyManager, TorProxy
+from api import TransAPI, FileProxyManager, TorProxy, MosTransportBan
 from sqlalchemy.orm import sessionmaker
 import threading
 from multiprocessing import Queue
@@ -27,7 +27,13 @@ def thread_job():
         coord = stops.get()
         log.debug(f"Thread is working with {coord}")
         lon, lat = coord
-        station_info = api.get_station_info(lon, lat)
+        station_info = None
+        while station_info is None:
+            try:
+                station_info = api.get_station_info(lon, lat)
+            except MosTransportBan:
+                log.warn("Changing ip")
+                api.change_ip()
         log.debug(f"{station_info}")
         stop = Stop.parse_obj(station_info)
         stop.save_forecast(session, commit=False)
