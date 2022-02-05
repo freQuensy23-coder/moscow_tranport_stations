@@ -1,3 +1,5 @@
+import time
+
 import requests as req
 import logging
 from random import choice
@@ -32,7 +34,7 @@ class TransAPI:
 
     def get_ip(self):
         link = "https://ifconfig.me"
-        self.make_req(link)
+        r = self.make_req(link)
         return r.content
 
     def change_ip(self):
