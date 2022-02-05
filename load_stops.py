@@ -50,7 +50,7 @@ while parsed_stops < max_stops:
     time.sleep(1)
 
 for t in threads:
-    log.info("Check threads")
+    print("Check threads")
     t.join()
 
 session.commit()
