@@ -1,15 +1,15 @@
 import logging
 import time
+from logging import basicConfig
 from threading import Thread
+
 import progressbar
+from sqlalchemy.orm import sessionmaker
+
+from api import TransAPI, MosTransportBan, TorProxy
 from db.db import engine
 from models import Stop
 from station import stops
-from api import TransAPI, MosTransportBan, TorProxy
-from sqlalchemy.orm import sessionmaker
-from tqdm import tqdm
-from logging import basicConfig
-from multiprocessing import Queue
 from utils import stops_list_to_queue
 
 proxy = TorProxy()
@@ -38,7 +38,7 @@ def parse_stop():
 
 
 threads = []
-N = 60
+N = 51
 for i in range(N):
     t = Thread(name=f"{i}", target=parse_stop)
     t.start()
@@ -50,6 +50,7 @@ while parsed_stops < max_stops:
     time.sleep(1)
 
 for t in threads:
+    log.info("Check threads")
     t.join()
 
 session.commit()
