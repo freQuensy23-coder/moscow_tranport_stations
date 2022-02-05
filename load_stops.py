@@ -50,3 +50,5 @@ while parsed_stops < max_stops:
 
 for t in threads:
     t.join()
+
+session.commit()
