@@ -18,7 +18,7 @@ args = parser.parse_args()
 log.debug(f"Command line args: {args}")
 
 logging.basicConfig(filename="parser.log", format='%(asctime)s %(levelname)s %(message)s ',
-                    level=args.loglevel, filemode="w")
+                    level=args.loglevel, filemode="a")
 session = sessionmaker(bind=engine)()
 
 
