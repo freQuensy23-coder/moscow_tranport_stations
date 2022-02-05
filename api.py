@@ -2,6 +2,7 @@ import requests as req
 import logging
 from random import choice
 from config import TOR_RESTART_DELAY, headers
+import os
 
 log = logging.getLogger("TransAPI")
 
