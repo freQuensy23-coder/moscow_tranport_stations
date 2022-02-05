@@ -10,6 +10,7 @@ import logging
 from datetime import datetime
 from cl_arguments import parser
 from time_limit import time_limit, TimeoutException
+from utils import stops_list_to_queue
 
 log = getLogger()
 
@@ -46,10 +47,7 @@ def main():
     if args.number_stops != -1:
         stops_list = stops_list[:args.number_stops]
 
-    stops = Queue()
-    for stop in stops_list:
-        coord = stop["Lon"], stop["Lat"]
-        stops.put(coord)
+    stops = stops_list_to_queue(stops_list)
 
     NUM_THREADS = args.threads
     NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS)
@@ -94,4 +92,3 @@ if __name__ == "__main__":
             main()
     except TimeoutException as e:
         log.warning("TIME LIMIT")
-
