@@ -25,7 +25,7 @@ class TransAPI:
             proxy = self.proxy_manager.get_proxy()
             r = self.requester.get(link, headers=headers, proxies=proxy)
         if r.content == b"":
-            log(f"Banned in MGT. Current ip is {self.get_ip()}")
+            log.warning(f"Banned in MGT. Current ip is {self.get_ip()}")
             raise MosTransportBan("You have been banned")
         station_data = r.json()
         log.debug(station_data)
