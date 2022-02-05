@@ -1,5 +1,5 @@
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy import create_engine
 
 from config import PATH_TO_DB, DB_ECHO
@@ -30,6 +30,9 @@ class Stop(Base):
     transport_type = Column(String)
     number = Column(String)
     last_stop_name = Column(String)
+
+    lon = Column(Float)
+    lat = Column(Float)
 
 
 Base.metadata.create_all(engine)

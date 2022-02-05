@@ -25,6 +25,9 @@ class Stop(BaseModel):
     id_: str = Field(alias="id")
     name: str
     route_path: list[RotePath] = Field(alias="routePath")
+    lon: float
+    lat: float
+
 
     def save_forecast(self, session: sqlalchemy.orm.Session, req_time: int = int(time()), commit=False):
         for path in self.route_path:
@@ -36,7 +39,9 @@ class Stop(BaseModel):
                     byTelemetry=forecast.byTelemetry,
                     tmId=forecast.tmId,
                     routePathId=forecast.routePathId,
-                    request_time=req_time
+                    request_time=req_time,
+                    lat=self.lat,
+                    lon=self.lon
                 )
                 session.add(p)
         if commit:
