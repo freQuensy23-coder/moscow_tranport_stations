@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 
-run_script = "/home/frequensy/MosTransParser/moscow_tranport_stations/venv/bin/python3.9 /home/frequensy/MosTransParser/moscow_tranport_stations/main.py --stations  /home/frequensy/MosTransParser/moscow_tranport_stations/trams.csv -d --tor >>  transport.log"
+run_script = "sudo /home/frequensy/MosTransParser/moscow_tranport_stations/venv/bin/python3.9 /home/frequensy/MosTransParser/moscow_tranport_stations/main.py --stations  /home/frequensy/MosTransParser/moscow_tranport_stations/trams.csv -d --tor"
 restart_tor = "sudo service tor reload"
 
 while True:
