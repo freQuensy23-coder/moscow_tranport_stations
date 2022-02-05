@@ -2,9 +2,9 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import create_engine
 
-from config import PATH_TO_DB
+from config import PATH_TO_DB, DB_ECHO
 
-engine = create_engine(PATH_TO_DB, echo=True)
+engine = create_engine(PATH_TO_DB, echo=DB_ECHO)
 Base = declarative_base()
 
 
