@@ -24,20 +24,21 @@ queue = stops_list_to_queue(stops_list)
 
 def parse_stop():
     global queue, session, parsed_stops
-    coord = lon, lat = queue.get()
-    stop = None
-    while stop is None:
-        try:
-            stop = Stop.parse_obj(api.get_station_info(lon, lat))
-        except MosTransportBan:
-            api.change_ip()
-    parsed_stops += 1
-    stop.save_stop(session, commit=False)
-    return stop
+    while not queue.empty():
+        coord = lon, lat = queue.get()
+        stop = None
+        while stop is None:
+            try:
+                stop = Stop.parse_obj(api.get_station_info(lon, lat))
+            except MosTransportBan:
+                api.change_ip()
+        parsed_stops += 1
+        stop.save_stop(session, commit=False)
+    return True
 
 
 threads = []
-N = 40
+N = 51
 for i in range(N):
     t = Thread(name=f"{i}", target=parse_stop)
     t.start()
