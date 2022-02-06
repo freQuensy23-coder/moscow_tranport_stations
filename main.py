@@ -1,3 +1,4 @@
+from config import LIMIT_REPEAT
 from db.db import engine
 from models import Stop
 from station import stops as stops_coord
@@ -29,14 +30,25 @@ def thread_job():
         log.debug(f"Thread is working with {coord}")
         lon, lat = coord
         station_info = None
+        repeat = 0
         while station_info is None:
+            repeat += 1
+            if repeat >= LIMIT_REPEAT:
+                raise MosTransportBan("Unable to get valid station data")
             try:
                 station_info = api.get_station_info(lon, lat)
+                log.debug(f"Parsing station info: {station_info}")
+                stop = Stop.parse_obj(station_info)
             except MosTransportBan:
-                log.warn("Changing ip")
+                log.warning("Changing ip")
                 api.change_ip()
-        log.debug(f"{station_info}")
-        stop = Stop.parse_obj(station_info)
+            except Exception as e:
+                log.exception(e)
+                log.warning(f"{e}")
+                log.warning("Changing ip..")
+                api.change_ip()
+                station_info = None
+
         stop.save_forecast(session, commit=False)
     log.debug("Thread finish working")
     return None

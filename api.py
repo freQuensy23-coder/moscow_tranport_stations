@@ -28,7 +28,7 @@ class TransAPI:
             log.warning(f"Banned in MGT. Current ip is {self.get_ip()}")
             raise MosTransportBan("You have been banned")
         station_data = r.json()
-        log.debug(station_data)
+        log.debug(f"API get station data {station_data} for station { (lon, lat)}. Link = {link}")
         log.debug(f"Get information about station {station_data.get('name')}, ID: {station_data.get('id')}")
         return station_data
 
@@ -87,6 +87,6 @@ class TorProxy:
 
 
 class MosTransportBan(Exception):
-    """Наш IP был забанен в мосгортрансе"""
+    """Ваш IP был забанен в мосгортрансе"""
     pass
 
