@@ -3,10 +3,13 @@ import time
 import requests as req
 import logging
 from random import choice
-from config import TOR_RESTART_DELAY, headers
+from config import TOR_RESTART_DELAY
+from fake_headers import Headers
 import os
 
 log = logging.getLogger("TransAPI")
+h = Headers()
+
 
 class TransAPI:
     def __init__(self, proxy_manager=None, requester=req):
@@ -19,11 +22,7 @@ class TransAPI:
 
     def get_station_info(self, lon, lat) -> dict:
         link = self.get_link(lon, lat)
-        if self.proxy_manager is None:
-            r = self.requester.get(link, headers=headers)
-        else:
-            proxy = self.proxy_manager.get_proxy()
-            r = self.requester.get(link, headers=headers, proxies=proxy)
+        r = self.make_req(link)
         if r.content == b"":
             log.warning(f"Banned in MGT. Current ip is {self.get_ip()}")
             raise MosTransportBan("You have been banned")
@@ -33,7 +32,7 @@ class TransAPI:
         return station_data
 
     def get_ip(self):
-        link = "https://ifconfig.me"
+        link = "https://ifconfig.me/ip"
         r = self.make_req(link)
         return r.content
 
@@ -42,15 +41,16 @@ class TransAPI:
             self.proxy_manager._change_ip()
             log.info(f"Ip changed, new ip is {self.get_ip()}")
         else:
-            log.warn("Trying to change IP but proxymanager didn't selected ot does not allowed to do this")
+            log.warning("Trying to change IP but proxymanager didn't selected ot does not allowed to do this")
             raise MosTransportBan("Trying to change IP but proxymanager is now allowed to do this")
 
     def make_req(self, link, **kwargs):
         if self.proxy_manager is None:
-            r = self.requester.get(link, *kwargs)
+            r = self.requester.get(link, headers=h.generate(), *kwargs)
         else:
             proxy = self.proxy_manager.get_proxy()
-            r = self.requester.get(link, proxies=proxy, *kwargs)
+            log.debug(f"Making req with proxy {proxy}")
+            r = self.requester.get(link, proxies=proxy, headers=h.generate(), *kwargs)
         return r
 
 
@@ -59,7 +59,7 @@ class FileProxyManager:
         f = open(file_name, "r")
         self._proxies = []
         for line in f:
-            data = line.strip().split(":")
+            data = line.strip().split(":")  # TODO сделать читаемее
             self._proxies.append({
                 'http': f'http://{data[2]}:{data[3]}@{data[0]}:{data[1]}',
                 'https': f'https://{data[2]}:{data[3]}@{data[0]}:{data[1]}',
@@ -68,7 +68,12 @@ class FileProxyManager:
         f.close()
 
     def get_proxy(self):
-        return choice(self._proxies)
+        proxy = choice(self._proxies)
+        log.debug(f"{proxy} selected by file proxy manager")
+        return proxy
+    def _change_ip(self):
+        # TODO добавлять API во временную отлегу
+        pass
 
 
 class TorProxy:
