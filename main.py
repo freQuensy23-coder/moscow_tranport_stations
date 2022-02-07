@@ -33,7 +33,8 @@ def thread_job():
         repeat = 0
         while station_info is None:
             repeat += 1
-            if repeat >= LIMIT_REPEAT:
+            if repeat >= LIMIT_REPEAT: # TODO Вынести всю вот эту логику в API
+                log.warning("Unable to get valid station data")
                 raise MosTransportBan("Unable to get valid station data")
             try:
                 station_info = api.get_station_info(lon, lat)
