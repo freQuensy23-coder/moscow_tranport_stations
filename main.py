@@ -1,3 +1,6 @@
+import sys
+import time
+
 from config import LIMIT_REPEAT
 from db.db import engine
 from models import Stop
@@ -56,7 +59,7 @@ def thread_job():
 
 
 def main():
-    global stops_list, NUM_THREADS, stops
+    global stops_list, NUM_THREADS, stops, threads
     if args.number_stops != -1:
         stops_list = stops_list[:args.number_stops]
 
@@ -105,3 +108,7 @@ if __name__ == "__main__":
             main()
     except TimeoutException as e:
         log.warning("TIME LIMIT")
+        session.commit()
+        log.warning("Time limit commit successfully")
+        time.sleep(10)
+        sys.exit()
