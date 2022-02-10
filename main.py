@@ -8,7 +8,6 @@ from station import stops as stops_coord
 from api import TransAPI, FileProxyManager, TorProxy, MosTransportBan
 from sqlalchemy.orm import sessionmaker
 import threading
-from multiprocessing import Queue
 from logging import getLogger
 import logging
 from datetime import datetime
@@ -35,18 +34,21 @@ def thread_job():
         station_info = None
         repeat = 0
         while station_info is None:
+            error_msg = ""
             repeat += 1
-            if repeat >= LIMIT_REPEAT: # TODO Вынести всю вот эту логику в API
-                log.warning("Unable to get valid station data")
-                raise MosTransportBan("Unable to get valid station data")
+            if repeat >= LIMIT_REPEAT:  # TODO Вынести всю вот эту логику в API
+                log.warning("Unable to get valid station data.")
+                raise MosTransportBan(f"Unable to get valid station data: {error_msg}")
             try:
                 station_info = api.get_station_info(lon, lat)
                 log.debug(f"Parsing station info: {station_info}")
                 stop = Stop.parse_obj(station_info)
             except MosTransportBan:
                 log.warning("Changing ip")
+                error_msg = "Ban in MGT"
                 api.change_ip()
             except Exception as e:
+                error_msg = f"other Exc. {e}"
                 log.exception(e)
                 log.warning(f"{e}")
                 log.warning("Changing ip..")
