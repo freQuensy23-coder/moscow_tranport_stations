@@ -2,8 +2,10 @@ import os
 import time
 from random import choice
 
-from api import log
 from config import TOR_RESTART_DELAY
+from logging import getLogger
+
+log = getLogger(name="ProxyManagers")
 
 
 class ProxyManager:
