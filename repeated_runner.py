@@ -22,8 +22,8 @@ while True:
         telelog("sleep")
         time.sleep(60 * 60)
     try:
-        telelog(f"Started in {datetime.now()}")
+        telelog(f"Started at {datetime.now()}")
         os.system(run_script)
     except:
-        telelog(f"Smth went wrong in {datetime.now()}")
+        telelog(f"Smth went wrong at {datetime.now()}")
     time.sleep(max(0, int(3*60 - (time.time() - t0))))
