@@ -14,7 +14,7 @@ from logging import getLogger
 import logging
 from datetime import datetime
 from cl_arguments import parser
-from time_limit import TimeoutException
+from utils import TimeoutException
 from utils import stops_list_to_queue, time_limit
 
 log = getLogger()
