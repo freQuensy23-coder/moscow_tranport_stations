@@ -4,7 +4,7 @@ from datetime import datetime
 
 import telegram_send
 
-run_script = "sudo /home/frequensy/MosTransParser/moscow_tranport_stations/venv/bin/python3.9 " \
+run_script = "/home/frequensy/MosTransParser/moscow_tranport_stations/venv/bin/python3.9 " \
              "/home/frequensy/MosTransParser/moscow_tranport_stations/main.py --stations  " \
              "/home/frequensy/MosTransParser/moscow_tranport_stations/uniq_stops.csv -d --proxy_file proxy.txt "
 restart_tor = "sudo service tor reload"
