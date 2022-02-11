@@ -1,10 +1,9 @@
 import unittest
 
 import config
-from api import TransAPI
-from proxy import FileProxyManager
-from station import stops
-from config import NUMBER_OF_STOPS, EXAMPLE_RESULT_FILE
+from api.api import TransAPI
+from api.proxy import FileProxyManager
+from config import EXAMPLE_RESULT_FILE
 from models import Stop
 
 

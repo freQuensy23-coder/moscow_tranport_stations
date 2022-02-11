@@ -1,20 +1,21 @@
 import sys
 import time
 
+import utils
 from config import LIMIT_REPEAT, THREAD_SLEEP
 from db.db import engine
 from models import Stop
 from station import stops as stops_coord
-from api import TransAPI
-from proxy import FileProxyManager, TorProxy, MosTransportBan
+from api.api import TransAPI
+from api.proxy import FileProxyManager, TorProxy, MosTransportBan
 from sqlalchemy.orm import sessionmaker
 import threading
 from logging import getLogger
 import logging
 from datetime import datetime
 from cl_arguments import parser
-from time_limit import time_limit, TimeoutException
-from utils import stops_list_to_queue
+from time_limit import TimeoutException
+from utils import stops_list_to_queue, time_limit
 
 log = getLogger()
 
@@ -108,7 +109,7 @@ if __name__ == "__main__":
     stops_list = list(stops_coord(f_name=args.stations_csv))
 
     try:
-        with time_limit(args.time_limit):
+        with time_limit(utils.time_limit):
             main()
     except TimeoutException as e:
         log.warning("TIME LIMIT")

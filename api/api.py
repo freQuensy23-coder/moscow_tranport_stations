@@ -2,7 +2,7 @@ import requests as req
 import logging
 from fake_headers import Headers
 
-from proxy import MosTransportBan
+from api.proxy import MosTransportBan
 
 log = logging.getLogger("TransAPI")
 h = Headers()
