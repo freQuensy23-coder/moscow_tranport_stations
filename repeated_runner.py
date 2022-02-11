@@ -26,4 +26,4 @@ while True:
         os.system(run_script)
     except:
         telelog(f"Smth went wrong in {datetime.now()}")
-    time.sleep(max(0, 3*60 - (time.time() - t0)))
+    time.sleep(max(0, int(3*60 - (time.time() - t0))))
