@@ -1,6 +1,7 @@
 import logging
 import os
 
+THREAD_SLEEP = 1
 NUM_THREADS = 55
 STATION_CSV = os.getcwd() + "/data.csv"
 EXAMPLE_RESULT_FILE = 'example_result.json'

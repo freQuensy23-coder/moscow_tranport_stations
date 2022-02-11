@@ -1,7 +1,7 @@
 import sys
 import time
 
-from config import LIMIT_REPEAT
+from config import LIMIT_REPEAT, THREAD_SLEEP
 from db.db import engine
 from models import Stop
 from station import stops as stops_coord
@@ -56,6 +56,7 @@ def thread_job():
                 station_info = None
 
         stop.save_forecast(session, commit=False)
+        time.sleep(THREAD_SLEEP)
     log.debug("Thread finish working")
     return None
 

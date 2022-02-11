@@ -17,6 +17,7 @@ def telelog(msg: str):
 
 
 while True:
+    t0 = time.time()
     if (datetime.now().hour + 3) % 24 < 5:
         telelog("sleep")
         time.sleep(60 * 60)
@@ -25,4 +26,4 @@ while True:
         os.system(run_script)
     except:
         telelog(f"Smth went wrong in {datetime.now()}")
-    time.sleep(25)
+    time.sleep(3*60 - (time.time() - t0))
