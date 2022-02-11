@@ -16,9 +16,10 @@ def telelog(msg: str):
     telegram_send.send(messages=[msg])
 
 
+sleep = True
 while True:
     t0 = time.time()
-    if (datetime.now().hour + 3) % 24 < 5:
+    if sleep and (datetime.now().hour + 3) % 24 < 5:
         telelog("sleep")
         time.sleep(60 * 60)
     try:
@@ -26,4 +27,4 @@ while True:
         os.system(run_script)
     except:
         telelog(f"Smth went wrong at {datetime.now()}")
-    time.sleep(max(0, int(3*60 - (time.time() - t0))))
+    time.sleep(max(0, int(3 * 60 - (time.time() - t0))))
