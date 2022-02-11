@@ -5,7 +5,8 @@ from config import LIMIT_REPEAT, THREAD_SLEEP
 from db.db import engine
 from models import Stop
 from station import stops as stops_coord
-from api import TransAPI, FileProxyManager, TorProxy, MosTransportBan
+from api import TransAPI
+from proxy import FileProxyManager, TorProxy, MosTransportBan
 from sqlalchemy.orm import sessionmaker
 import threading
 from logging import getLogger

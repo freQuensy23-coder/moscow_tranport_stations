@@ -6,7 +6,8 @@ from threading import Thread
 import progressbar
 from sqlalchemy.orm import sessionmaker
 
-from api import TransAPI, MosTransportBan, TorProxy
+from api import TransAPI
+from proxy import TorProxy, MosTransportBan
 from db.db import engine
 from models import Stop
 from station import stops
