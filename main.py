@@ -2,7 +2,7 @@ import sys
 import time
 
 import utils
-from config import LIMIT_REPEAT, THREAD_SLEEP
+from config import LIMIT_REPEAT, THREAD_SLEEP, TIME_LIMIT
 from db.db import engine
 from models import Stop
 from station import stops as stops_coord
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     stops_list = list(stops_coord(f_name=args.stations_csv))
 
     try:
-        with time_limit(utils.time_limit):
+        with time_limit(TIME_LIMIT):
             main()
     except TimeoutException as e:
         log.warning("TIME LIMIT")
