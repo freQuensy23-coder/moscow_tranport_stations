@@ -14,19 +14,26 @@ class TransAPI:
         self.proxy_manager = proxy_manager
 
     @staticmethod
-    def get_link(lon, lat) -> str:
-        return f"https://moscowtransport.app/api/qr-stop/1111/stop?p={lon},{lat}"
+    def get_link(**kwargs) -> str:
+        if kwargs.get("lon") and kwargs.get("lat"):
+            lon, lat = kwargs["lon"], kwargs['lat']
+            return f"https://moscowtransport.app/api/qr-stop/1111/stop?p={lon},{lat}"
+        else:
+            stop_id = kwargs["stop_id"]
+            return f"https://moscowtransport.app/api/stop_v2/{stop_id}"
 
-    def get_station_info(self, lon, lat) -> dict:
-        link = self.get_link(lon, lat)
-        r = self.make_req(link)
-        if r.content == b"":
-            log.warning(f"Banned in MGT. Current ip is {self.get_ip()}")
-            raise MosTransportBan("You have been banned")
-        station_data = r.json()
-        log.debug(f"API get station data {station_data} for station {(lon, lat)}. Link = {link}")
-        log.debug(f"Get information about station {station_data.get('name')}, ID: {station_data.get('id')}")
-        return station_data
+    def get_station_info(self, **kwargs) -> dict:
+        if kwargs.get('lon'):
+            lon, lat = kwargs.get("lon"), kwargs.get("lat")
+            link = self.get_link(**kwargs)
+            r = self.make_req(link)
+            if r.content == b"":
+                log.warning(f"Banned in MGT. Current ip is {self.get_ip()}")
+                raise MosTransportBan("You have been banned")
+            station_data = r.json()
+            log.debug(f"API get station data {station_data} for station {(lon, lat)}. Link = {link}")
+            log.debug(f"Get information about station {station_data.get('name')}, ID: {station_data.get('id')}")
+            return station_data
 
     def get_ip(self):
         link = "https://ifconfig.me/ip"
