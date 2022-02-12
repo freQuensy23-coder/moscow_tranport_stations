@@ -46,16 +46,18 @@ class Stop(BaseModel):
 
     def save_stop(self, session: sqlalchemy.orm.Session, commit=False):
         for r in self.route_path:
-            s = db.db.Stop(
-                stop_id=self.id_,
-                name=self.name,
-                route_path_id=r.id_,
-                transport_type=r.transport_type,
-                number=r.number,
-                last_stop_name=r.lastStopName,
-                lat=self.lat,
-                lon=self.lon
-            )
-            session.add(s)
+            if len(r.externalForecast) != 0:
+                s = db.db.Stop(
+                    stop_id=self.id_,
+                    name=self.name,
+                    route_path_id=r.id_,
+                    routePathId=r.externalForecast[0].routePathId,
+                    transport_type=r.transport_type,
+                    number=r.number,
+                    last_stop_name=r.lastStopName,
+                    lat=self.lat,
+                    lon=self.lon
+                )
+                session.add(s)
         if commit:
             session.commit()

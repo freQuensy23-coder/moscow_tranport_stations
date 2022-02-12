@@ -48,15 +48,12 @@ for i in range(N):
     threads.append(t)
 
 bar = progressbar.ProgressBar(max_value=max_stops)
-while parsed_stops <  max_stops:
+while parsed_stops < max_stops:
     bar.update(parsed_stops)
     time.sleep(1)
     if parsed_stops % 100 == 0:
         session.commit()
 
-# for t in threads:
-#     print("Check threads")
-#     t.join()
 print("Commiting")
 session.commit()
 

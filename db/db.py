@@ -27,6 +27,7 @@ class Stop(Base):
     name = Column(String)
 
     route_path_id = Column(String)
+    routePathId = Column(String)
     transport_type = Column(String)
     number = Column(String)
     last_stop_name = Column(String)
