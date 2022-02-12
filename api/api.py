@@ -36,9 +36,10 @@ class TransAPI:
             return station_data
 
     def get_ip(self):
-        link = "https://ifconfig.me/ip"
-        r = self.make_req(link)
-        return r.content
+        # link = "https://ifconfig.me/ip"
+        # r = self.make_req(link)
+        # return r.content
+        return "11"
 
     def change_ip(self):
         if self.proxy_manager and "_change_ip" in dir(self.proxy_manager):
