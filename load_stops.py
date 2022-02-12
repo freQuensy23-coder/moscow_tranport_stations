@@ -7,14 +7,14 @@ import progressbar
 from sqlalchemy.orm import sessionmaker
 
 from api.api import TransAPI
-from api.proxy import TorProxy, MosTransportBan
+from api.proxy import FileProxyManager, MosTransportBan
 from db.db import engine
 from models import Stop
 from station import stops
 from utils import stops_list_to_queue
 
-proxy = TorProxy()
-api = TransAPI(proxy)
+
+api = TransAPI(FileProxyManager(file_name='proxy.txt'))
 session = sessionmaker(bind=engine)()
 stops_list = list(stops(f_name="data.csv"))
 basicConfig(level=logging.DEBUG, filemode="a", filename="load_stops.log")
@@ -30,8 +30,10 @@ def parse_stop():
         stop = None
         while stop is None:
             try:
-                stop = Stop.parse_obj(api.get_station_info(lon, lat))
+                stop = Stop.parse_obj(api.get_station_info(lon=lon, lat=lat))
             except MosTransportBan:
+                api.change_ip()
+            except:
                 api.change_ip()
         parsed_stops += 1
         stop.save_stop(session, commit=False)
@@ -39,19 +41,22 @@ def parse_stop():
 
 
 threads = []
-N = 51
+N = 49
 for i in range(N):
     t = Thread(name=f"{i}", target=parse_stop)
     t.start()
     threads.append(t)
 
 bar = progressbar.ProgressBar(max_value=max_stops)
-while parsed_stops < max_stops:
+while parsed_stops <  max_stops:
     bar.update(parsed_stops)
     time.sleep(1)
+    if parsed_stops % 100 == 0:
+        session.commit()
 
-for t in threads:
-    print("Check threads")
-    t.join()
-
+# for t in threads:
+#     print("Check threads")
+#     t.join()
+print("Commiting")
 session.commit()
+
