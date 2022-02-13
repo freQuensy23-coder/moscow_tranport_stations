@@ -104,7 +104,7 @@ if __name__ == "__main__":
     else:
         api = TransAPI()
 
-    stops_ids = list(stops_coord(f_name=args.stations_csv))
+    stops_list = list(stops_coord(f_name=args.stations_csv))
 
     try:
         with time_limit(TIME_LIMIT):
