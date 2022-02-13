@@ -1,7 +1,6 @@
 import sys
 import time
 
-import utils
 from config import LIMIT_REPEAT, THREAD_SLEEP, TIME_LIMIT
 from db.db import engine
 from models import Stop
@@ -14,7 +13,7 @@ from logging import getLogger
 import logging
 from datetime import datetime
 from cl_arguments import parser
-from utils import TimeoutException
+from utils import TimeoutException, stops_list_to_stop_id_queue
 from utils import stops_list_to_queue, time_limit
 
 log = getLogger()
@@ -30,9 +29,8 @@ session = sessionmaker(bind=engine)()
 def thread_job():
     """Поток получает остановки из очереди и занимается их обработкой"""
     while not stops.empty():
-        coord = stops.get()
-        log.debug(f"Thread is working with {coord}")
-        lon, lat = coord
+        stop_id = stops.get()
+        log.debug(f"Thread is working with {stop_id}")
         station_info = None
         repeat = 0
         while station_info is None:
@@ -42,7 +40,7 @@ def thread_job():
                 log.warning("Unable to get valid station data.")
                 raise MosTransportBan(f"Unable to get valid station data: {error_msg}")
             try:
-                station_info = api.get_station_info(lon, lat)
+                station_info = api.get_station_info(stop_id=stop_id)
                 log.debug(f"Parsing station info: {station_info}")
                 stop = Stop.parse_obj(station_info)
             except MosTransportBan:
@@ -68,7 +66,7 @@ def main():
     if args.number_stops != -1:
         stops_list = stops_list[:args.number_stops]
 
-    stops = stops_list_to_queue(stops_list)
+    stops = stops_list_to_stop_id_queue(stops_list)
 
     NUM_THREADS = args.threads
     NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS)
@@ -106,7 +104,7 @@ if __name__ == "__main__":
     else:
         api = TransAPI()
 
-    stops_list = list(stops_coord(f_name=args.stations_csv))
+    stops_ids = list(stops_coord(f_name=args.stations_csv))
 
     try:
         with time_limit(TIME_LIMIT):

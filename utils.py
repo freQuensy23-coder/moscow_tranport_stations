@@ -12,6 +12,14 @@ def stops_list_to_queue(data: list) -> Queue:
     return result
 
 
+def stops_list_to_stop_id_queue(data: list) -> Queue:
+    result = Queue()
+    for stop in data:
+        coord = stop["stop_id"]
+        result.put(coord)
+    return result
+
+
 class TimeoutException(Exception): pass
 
 

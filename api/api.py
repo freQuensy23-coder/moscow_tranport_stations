@@ -34,6 +34,17 @@ class TransAPI:
             log.debug(f"API get station data {station_data} for station {(lon, lat)}. Link = {link}")
             log.debug(f"Get information about station {station_data.get('name')}, ID: {station_data.get('id')}")
             return station_data
+        elif kwargs.get("stop_id"):
+            stop_id = kwargs["stop_id"]
+            link = self.get_link(**kwargs)
+            r = self.make_req(link)
+            if r.content == b"":
+                log.warning(f"Banned in MGT. Current ip is {self.get_ip()}")
+                raise MosTransportBan("You have been banned")
+            station_data = r.json()
+            log.debug(f"API get station data {station_data} for station {stop_id}. Link = {link}")
+            log.debug(f"Get information about station {station_data.get('name')}, ID: {station_data.get('stop_id')}")
+            return station_data
 
     def get_ip(self):
         # link = "https://ifconfig.me/ip"
