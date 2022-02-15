@@ -8,7 +8,6 @@ from station import stops as stops_coord
 from api import TransAPI, FileProxyManager, TorProxy, MosTransportBan
 from sqlalchemy.orm import sessionmaker
 import threading
-from multiprocessing import Queue
 from logging import getLogger
 import logging
 from datetime import datetime
