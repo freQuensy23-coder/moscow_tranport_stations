@@ -15,7 +15,7 @@ from utils import stops_list_to_queue
 proxy = TorProxy()
 api = TransAPI(proxy)
 session = sessionmaker(bind=engine)()
-stops_list = list(stops(f_name="data.csv"))
+stops_list = list(stops_queue(f_name="data.csv"))
 basicConfig(level=logging.DEBUG, filemode="a", filename="load_stops.log")
 parsed_stops = 0
 max_stops = len(stops_list)

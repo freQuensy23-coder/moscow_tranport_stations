@@ -15,3 +15,4 @@ headers = {'sec-ch-ua': 'Not;A Brand";v="95", "Google Chrome";v="95", "Chromium"
                          'Safari/537.36'}
 DB_ECHO = False
 LIMIT_REPEAT = 4
+DELAY_STOPS = 20
