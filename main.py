@@ -1,20 +1,18 @@
 import sys
 import time
 
-from config import LIMIT_REPEAT, THREAD_SLEEP, TIME_LIMIT
+from config import LIMIT_REPEAT, DELAY_STOPS
 from db.db import engine
 from models import Stop
-from station import stops as stops_coord
-from api.api import TransAPI
-from api.proxy import FileProxyManager, TorProxy, MosTransportBan
+from station import stops_coord
+from api import TransAPI, FileProxyManager, TorProxy, MosTransportBan
 from sqlalchemy.orm import sessionmaker
 import threading
 from logging import getLogger
 import logging
 from datetime import datetime
 from cl_arguments import parser
-from utils import TimeoutException, stops_list_to_stop_id_queue
-from utils import stops_list_to_queue, time_limit
+from utils import stops_list_to_queue
 
 log = getLogger()
 
@@ -26,29 +24,28 @@ logging.basicConfig(filename="parser.log", format='%(asctime)s %(levelname)s %(m
 session = sessionmaker(bind=engine)()
 
 
-def thread_job():
+def parser_thread():
     """Поток получает остановки из очереди и занимается их обработкой"""
-    while not stops.empty():
-        stop_id = stops.get()
-        log.debug(f"Thread is working with {stop_id}")
+    work = True
+    while work:
+        coord = stops_queue.get()
+        log.debug(f"Thread is working with {coord}")
+        lon, lat = coord
         station_info = None
         repeat = 0
         while station_info is None:
-            error_msg = ""
             repeat += 1
             if repeat >= LIMIT_REPEAT:  # TODO Вынести всю вот эту логику в API
-                log.warning("Unable to get valid station data.")
-                raise MosTransportBan(f"Unable to get valid station data: {error_msg}")
+                log.warning("Unable to get valid station data")
+                raise MosTransportBan("Unable to get valid station data")
             try:
-                station_info = api.get_station_info(stop_id=stop_id)
+                station_info = api.get_station_info(lon, lat)
                 log.debug(f"Parsing station info: {station_info}")
                 stop = Stop.parse_obj(station_info)
             except MosTransportBan:
                 log.warning("Changing ip")
-                error_msg = "Ban in MGT"
                 api.change_ip()
             except Exception as e:
-                error_msg = f"other Exc. {e}"
                 log.exception(e)
                 log.warning(f"{e}")
                 log.warning("Changing ip..")
@@ -56,39 +53,28 @@ def thread_job():
                 station_info = None
 
         stop.save_forecast(session, commit=False)
-        time.sleep(THREAD_SLEEP)
     log.debug("Thread finish working")
     return None
 
 
+def work_manager_thread():
+    global stops_queue
+    work = True
+    while work:
+        time.sleep(DELAY_STOPS)
+        stops_queue = stops_list_to_queue(stops_list, queue=stops_queue)
+        time_req = datetime.now()
+        log.info(f"Перехожу к сохранению данных. Загрузка заняла {time_req - time_start}")
+        session.commit()
+        time_save = datetime.now()
+        log.info(
+            f"Сохранено!. Сохранение в бд заняло {time_save - time_req}. Общее время работы этого запуска: {time_save - time_start}")
+
+
 def main():
-    global stops_list, NUM_THREADS, stops, threads
-    if args.number_stops != -1:
-        stops_list = stops_list[:args.number_stops]
-
-    stops = stops_list_to_stop_id_queue(stops_list)
-
-    NUM_THREADS = args.threads
-    NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS)
-    log.info(f"Creating {NUM_THREADS} threads")
-
-    threads = []
-    for i in range(NUM_THREADS):
-        t = threading.Thread(target=thread_job, name=f"{i}")
-        t.start()
-        threads.append(t)
-
-    for t in threads:
-        log.debug(f"Waiting for Thread {t.name}")
-        t.join()
-        log.debug(f"Thread {t.name} finished")
-
-    time_req = datetime.now()
-    log.info(f"Перехожу к сохранению данных. Загрузка заняла {time_req - time_start}")
-    session.commit()
-    time_save = datetime.now()
-    log.info(
-        f"Отработал. Сохранение в бд заняло {time_save - time_req}. Общее время работы этого запуска: {time_save - time_start}")
+    global stops_list, NUM_THREADS, stops_queue, threads
+    for worker in threads:
+        worker.join()
 
 
 if __name__ == "__main__":
@@ -106,12 +92,21 @@ if __name__ == "__main__":
 
     stops_list = list(stops_coord(f_name=args.stations_csv))
 
-    try:
-        with time_limit(TIME_LIMIT):
-            main()
-    except TimeoutException as e:
-        log.warning("TIME LIMIT")
-        session.commit()
-        log.warning("Time limit commit successfully")
-        time.sleep(10)
-        sys.exit()
+    if args.number_stops != -1:
+        stops_list = stops_list[:args.number_stops]
+
+    stops_queue = stops_list_to_queue(stops_list)
+
+    NUM_THREADS = args.threads
+    NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS)
+    log.info(f"Creating {NUM_THREADS} threads")
+
+    manager = threading.Thread(target=work_manager_thread, name="manager")
+    manager.start()
+
+    threads = []
+    for i in range(NUM_THREADS):
+        t = threading.Thread(target=parser_thread, name=f"{i}")
+        t.start()
+        threads.append(t)
+    main()
