@@ -5,7 +5,7 @@ from db.db import engine
 from models import Stop
 from station import stops_coord
 from api.api import TransAPI, MosTransportBan
-from api.proxy import FileProxyManager, TorProxy,
+from api.proxy import FileProxyManager, TorProxy
 from sqlalchemy.orm import sessionmaker
 import threading
 from logging import getLogger
