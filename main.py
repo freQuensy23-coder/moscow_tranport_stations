@@ -1,11 +1,11 @@
-import sys
 import time
 
 from config import LIMIT_REPEAT, DELAY_STOPS
 from db.db import engine
 from models import Stop
 from station import stops_coord
-from api import TransAPI, FileProxyManager, TorProxy, MosTransportBan
+from api.api import TransAPI, MosTransportBan
+from api.proxy import FileProxyManager, TorProxy,
 from sqlalchemy.orm import sessionmaker
 import threading
 from logging import getLogger
@@ -39,7 +39,7 @@ def parser_thread():
                 log.warning("Unable to get valid station data")
                 raise MosTransportBan("Unable to get valid station data")
             try:
-                station_info = api.get_station_info(lon, lat)
+                station_info = api.get_station_info()
                 log.debug(f"Parsing station info: {station_info}")
                 stop = Stop.parse_obj(station_info)
             except MosTransportBan:
