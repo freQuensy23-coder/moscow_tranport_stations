@@ -28,9 +28,8 @@ def parser_thread():
     """Поток получает остановки из очереди и занимается их обработкой"""
     work = True
     while work:
-        coord = stops_queue.get()
-        log.debug(f"Thread is working with {coord}")
-        lon, lat = coord
+        stop_id = stops_queue.get()
+        log.debug(f"Thread is working with {stop_id}")
         station_info = None
         repeat = 0
         while station_info is None:
@@ -39,7 +38,7 @@ def parser_thread():
                 log.warning("Unable to get valid station data")
                 raise MosTransportBan("Unable to get valid station data")
             try:
-                station_info = api.get_station_info()
+                station_info = api.get_station_info(stop_id=stop_id)
                 log.debug(f"Parsing station info: {station_info}")
                 stop = Stop.parse_obj(station_info)
             except MosTransportBan:
@@ -64,11 +63,11 @@ def work_manager_thread():
         time.sleep(DELAY_STOPS)
         stops_queue = stops_list_to_queue(stops_list, queue=stops_queue)
         time_req = datetime.now()
-        log.info(f"Перехожу к сохранению данных. Загрузка заняла {time_req - time_start}")
+        log.info(f"Saving data. Downloading takes {time_req - time_start}s")
         session.commit()
         time_save = datetime.now()
         log.info(
-            f"Сохранено!. Сохранение в бд заняло {time_save - time_req}. Общее время работы этого запуска: {time_save - time_start}")
+            f"Saved!. Saving to DB takes{time_save - time_req} s. Total time: {time_save - time_start} s")
 
 
 def main():
