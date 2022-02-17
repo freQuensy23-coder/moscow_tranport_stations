@@ -3,9 +3,14 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy import create_engine
 
-from config import PATH_TO_DB, DB_ECHO
+from config import DB_CONNECTION_STRING, DB_ECHO
 
-engine = create_engine(PATH_TO_DB, echo=DB_ECHO)
+engine = create_engine(DB_CONNECTION_STRING, echo=DB_ECHO,
+                       pool_size=10,
+                       max_overflow=2,
+                       pool_recycle=300,
+                       pool_pre_ping=True,
+                       pool_use_lifo=True)
 Base = declarative_base()
 
 
