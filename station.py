@@ -1,7 +1,7 @@
 import csv
 
 
-def stops(f_name):
+def stops_coord(f_name):
   """Генератор возвращающий по очереди информацию о автобусных остановках"""
   with open(f_name, 'r') as f:
       reader = csv.DictReader(f)

@@ -7,6 +7,7 @@ from config import EXAMPLE_RESULT_FILE
 from models import Stop
 
 
+
 class TestDataValidation(unittest.TestCase):
     def setUp(self):
         with open(EXAMPLE_RESULT_FILE, "r") as f:
