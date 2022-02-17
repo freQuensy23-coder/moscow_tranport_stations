@@ -8,7 +8,7 @@ def stops_list_to_queue(data: list, queue: Queue = None) -> Queue:
     if queue is None:
         queue = Queue()
     for stop in data:
-        coord = stop["Lon"], stop["Lat"]
+        coord = stop["stop_id"]
         queue.put(coord)
     return queue
 
