@@ -4,13 +4,13 @@ from contextlib import contextmanager
 from multiprocessing import Queue
 
 
-def stops_list_to_queue(data: list) -> Queue:
-    result = Queue()
+def stops_list_to_queue(data: list, queue: Queue = None) -> Queue:
+    if queue is None:
+        queue = Queue()
     for stop in data:
         coord = stop["Lon"], stop["Lat"]
-        result.put(coord)
-    return result
-
+        queue.put(coord)
+    return queue
 
 def stops_list_to_stop_id_queue(data: list) -> Queue:
     result = Queue()
