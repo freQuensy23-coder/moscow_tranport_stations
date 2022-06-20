@@ -1,5 +1,9 @@
+import os
 import queue
+import sys
 import time
+
+import psutil as psutil
 
 from config import LIMIT_REPEAT, DELAY_STOPS
 from db.db import engine
@@ -75,7 +79,7 @@ def work_manager_thread():
             f"Saved!. Saving to DB takes{time_save - time_req} s. Total time: {time_save - time_start} s")
 
 
-def main():
+def wait_for_threads():
     global stops_list, NUM_THREADS, stops_queue, threads
     for worker in threads:
         worker.join()
@@ -112,4 +116,9 @@ if __name__ == "__main__":
         t = threading.Thread(target=parser_thread, name=f"{i}")
         t.start()
         threads.append(t)
-    main()
+    wait_for_threads()
+    log.info("Done!")
+
+    current_system_pid = os.getpid() # TODO Придумать адекватный метод завершения программы и понять почему она не завершалась раньше
+    ThisSystem = psutil.Process(current_system_pid)
+    ThisSystem.terminate()
