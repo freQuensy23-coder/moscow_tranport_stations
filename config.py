@@ -3,7 +3,7 @@ import os
 
 THREAD_SLEEP = 1 # Задержка потока
 NUM_THREADS = 55 # Количество создаваемы потоков
-STATION_CSV = os.getcwd() + "/stations.csv" # CSV файл с информацией об остановкам по которым делаются запросы
+STATION_CSV = os.getcwd() + "/stop.csv" # CSV файл с информацией об остановкам по которым делаются запросы
 
 DB_CONNECTION_STRING = f"postgresql://{os.getenv('db_login')}:{os.getenv('db_pass')}" \
              f"@{os.getenv('db_host')}:{os.getenv('db_port')}/transmetrika" # Параметры БД
