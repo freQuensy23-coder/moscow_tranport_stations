@@ -5,12 +5,14 @@ from multiprocessing import Queue
 
 
 def stops_list_to_queue(data: list, queue: Queue = None) -> Queue:
+    """Создает очередь из списка координат остановок (tuple)"""
     if queue is None:
         queue = Queue()
     for stop in data:
         coord = stop["stop_id"]
         queue.put(coord)
     return queue
+
 
 def stops_list_to_stop_id_queue(data: list) -> Queue:
     result = Queue()

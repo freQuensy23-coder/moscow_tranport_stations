@@ -1,3 +1,4 @@
+import queue
 import time
 
 from config import LIMIT_REPEAT, DELAY_STOPS
@@ -28,13 +29,17 @@ def parser_thread():
     """Поток получает остановки из очереди и занимается их обработкой"""
     work = True
     while work:
-        stop_id = stops_queue.get()
+        try:
+            stop_id = stops_queue.get(block=False)
+        except queue.Empty:
+            log.debug("Finish. Queue is empty.")
+            return None
         log.debug(f"Thread is working with {stop_id}")
         station_info = None
         repeat = 0
         while station_info is None:
             repeat += 1
-            if repeat >= LIMIT_REPEAT:  # TODO Вынести всю вот эту логику в API
+            if repeat >= LIMIT_REPEAT:  # TODO Вынести всю вот эту логику в API если куча запросов не прошло надо прекращать пытаться
                 log.warning("Unable to get valid station data")
                 raise MosTransportBan("Unable to get valid station data")
             try:
@@ -51,7 +56,7 @@ def parser_thread():
                 api.change_ip()
                 station_info = None
 
-        stop.save_forecast(session, commit=False)
+        stop.save_forecast(session, commit=False) # TODO
     log.debug("Thread finish working")
     return None
 
@@ -91,14 +96,13 @@ if __name__ == "__main__":
 
     stops_list = list(stops_coord(f_name=args.stations_csv))
 
-    if args.number_stops != -1:
-        stops_list = stops_list[:args.number_stops]
-
-    stops_queue = stops_list_to_queue(stops_list)
-
     NUM_THREADS = args.threads
     NUM_THREADS = min(len(stops_list) - 1, NUM_THREADS)
     log.info(f"Creating {NUM_THREADS} threads")
+
+    if args.number_stops != -1:
+        stops_list = stops_list[:args.number_stops]
+    stops_queue = stops_list_to_queue(stops_list)
 
     manager = threading.Thread(target=work_manager_thread, name="manager")
     manager.start()
