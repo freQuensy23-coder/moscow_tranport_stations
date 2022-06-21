@@ -25,7 +25,7 @@ class ProxyManager:
     def _change_ip(*args):
         """Method calls if requests from ip is not working."""
         log.info("Changing IP...")
-        # TODO добавлять API во временную отлегу
+        # TODO добавлять IP во временную отлегу
         pass
 
 
