@@ -64,21 +64,6 @@ def parser_thread():
     log.debug("Thread finish working")
     return None
 
-
-def work_manager_thread():
-    global stops_queue
-    work = True
-    while work:
-        time.sleep(DELAY_STOPS)
-        stops_queue = stops_list_to_queue(stops_list, queue=stops_queue)
-        time_req = datetime.now()
-        log.info(f"Saving data. Downloading takes {time_req - time_start}s")
-        session.commit()
-        time_save = datetime.now()
-        log.info(
-            f"Saved!. Saving to DB takes{time_save - time_req} s. Total time: {time_save - time_start} s")
-
-
 def wait_for_threads():
     global stops_list, NUM_THREADS, stops_queue, threads
     for worker in threads:
@@ -108,17 +93,12 @@ if __name__ == "__main__":
         stops_list = stops_list[:args.number_stops]
     stops_queue = stops_list_to_queue(stops_list)
 
-    manager = threading.Thread(target=work_manager_thread, name="manager")
-    manager.start()
-
     threads = []
     for i in range(NUM_THREADS):
         t = threading.Thread(target=parser_thread, name=f"{i}")
         t.start()
         threads.append(t)
     wait_for_threads()
+    session.commit()
     log.info("Done!")
 
-    current_system_pid = os.getpid() # TODO Придумать адекватный метод завершения программы и понять почему она не завершалась раньше
-    ThisSystem = psutil.Process(current_system_pid)
-    ThisSystem.terminate()
