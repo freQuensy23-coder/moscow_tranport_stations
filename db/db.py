@@ -14,7 +14,7 @@ Base = declarative_base()
 
 
 class Prediction(Base):
-    __tablename__ = "forecast"
+    __tablename__ = "prediction_data"
     id = Column(Integer, primary_key=True)
     stop_id = Column(String)
     route_path_id = Column(String)
@@ -26,7 +26,7 @@ class Prediction(Base):
 
 
 class Stop(Base):
-    __tablename__ = 'stop'
+    __tablename__ = 'stops'
     id = Column(Integer, primary_key=True)
     stop_id = Column(String)
     name = Column(String)

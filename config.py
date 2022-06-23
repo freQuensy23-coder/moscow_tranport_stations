@@ -7,7 +7,7 @@ STATION_CSV = os.getcwd() + "/stop.csv" # CSV файл с информацией
 
 DB_CONNECTION_STRING = f"postgresql://{os.getenv('db_login')}:{os.getenv('db_pass')}" \
              f"@{os.getenv('db_host')}:{os.getenv('db_port')}/transmetrika" # Параметры БД
-DB_ECHO = False # Выводить ли в консоль SQL запросы
+DB_ECHO = True # Выводить ли в консоль SQL запросы
 
 
 PROXIES_FILE = "proxy.txt" # файл с прокси по умолчанию
