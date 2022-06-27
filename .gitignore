@@ -157,3 +157,8 @@ cython_debug/
 
 # Config
 config.py
+
+# VSCODE
+.vscode
+
+.python-version

@@ -2,7 +2,14 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy import create_engine
 
+import sys
+import os
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
 from config import DB_CONNECTION_STRING, DB_ECHO
+
 
 engine = create_engine(DB_CONNECTION_STRING, echo=DB_ECHO,
                        pool_size=10,

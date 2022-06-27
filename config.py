@@ -1,5 +1,8 @@
 import logging
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 THREAD_SLEEP = 1 # Задержка потока
 NUM_THREADS = 55 # Количество создаваемы потоков
