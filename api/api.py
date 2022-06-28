@@ -3,6 +3,7 @@ import logging
 from fake_headers import Headers
 
 from api.proxy import MosTransportBan
+from config import PROXY_REUSE
 
 log = logging.getLogger("TransAPI")
 h = Headers()
@@ -12,6 +13,7 @@ class TransAPI:
     def __init__(self, proxy_manager=None, requester=req):
         self.requester = requester
         self.proxy_manager = proxy_manager
+        self.counter = 1
 
     @staticmethod
     def get_link(**kwargs) -> str:
@@ -23,6 +25,8 @@ class TransAPI:
             return f"https://moscowtransport.app/api/stop_v2/{stop_id}"
 
     def get_station_info(self, **kwargs) -> dict:
+        if self.counter % PROXY_REUSE == 0:
+            raise MosTransportBan("IP change")
         if kwargs.get('lon'):
             lon, lat = kwargs.get("lon"), kwargs.get("lat")
             link = self.get_link(**kwargs)
