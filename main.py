@@ -1,11 +1,6 @@
-import os
 import queue
-import sys
-import time
 
-import psutil as psutil
-
-from config import LIMIT_REPEAT, DELAY_STOPS
+from config import LIMIT_REPEAT
 from db.db import engine
 from models import Stop
 from station import stops_coord
@@ -31,8 +26,7 @@ session = sessionmaker(bind=engine)()
 
 def parser_thread():
     """Поток получает остановки из очереди и занимается их обработкой"""
-    work = True
-    while work:
+    while True:
         try:
             stop_id = stops_queue.get(block=False)
         except queue.Empty:
@@ -63,6 +57,7 @@ def parser_thread():
         stop.save_forecast(session, commit=False) # TODO
     log.debug("Thread finish working")
     return None
+
 
 def wait_for_threads():
     global stops_list, NUM_THREADS, stops_queue, threads
@@ -101,4 +96,3 @@ if __name__ == "__main__":
     wait_for_threads()
     session.commit()
     log.info("Done!")
-
