@@ -12,6 +12,8 @@ DB_CONNECTION_STRING = f"postgresql://{os.getenv('db_login')}:{os.getenv('db_pas
              f"@{os.getenv('db_host')}:{os.getenv('db_port')}/transmetrika" # Параметры БД
 DB_ECHO = True # Выводить ли в консоль SQL запросы
 
+TOR_PASSWORD = os.getenv('tor_password')
+
 
 PROXIES_FILE = "proxy.txt" # файл с прокси по умолчанию
 TOR_RESTART_DELAY: int = 5 # задержка после перезагружки сервиса тор

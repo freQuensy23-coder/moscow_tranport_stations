@@ -1,9 +1,12 @@
+import time
 import requests as req
 import logging
+
 from fake_headers import Headers
+from requests_tor import RequestsTor as req_tor
 
 from api.proxy import MosTransportBan
-from config import PROXY_REUSE
+from config import PROXY_REUSE, TOR_PASSWORD
 
 log = logging.getLogger("TransAPI")
 h = Headers()
@@ -25,8 +28,6 @@ class TransAPI:
             return f"https://moscowtransport.app/api/stop_v2/{stop_id}"
 
     def get_station_info(self, **kwargs) -> dict:
-        if self.counter % PROXY_REUSE == 0:
-            raise MosTransportBan("IP change")
         if kwargs.get('lon'):
             lon, lat = kwargs.get("lon"), kwargs.get("lat")
             link = self.get_link(**kwargs)
@@ -39,6 +40,7 @@ class TransAPI:
             log.debug(f"Get information about station {station_data.get('name')}, ID: {station_data.get('id')}")
             return station_data
         elif kwargs.get("stop_id"):
+            print('we are in')
             stop_id = kwargs["stop_id"]
             link = self.get_link(**kwargs)
             r = self.make_req(link)
@@ -74,3 +76,26 @@ class TransAPI:
         return r
 
 
+class TorTransAPI(TransAPI):
+    def __init__(self, proxy_manager=None, requester=None):
+        self.requester = req_tor(tor_ports=(9000, 9001, 9002, 9003, 9004),
+                                 tor_cport=9051,
+                                 password=TOR_PASSWORD, autochange_id=PROXY_REUSE)
+        print('tor is being used')
+
+    def get_station_info(self, **kwargs) -> dict:
+        super().get_station_info('TransAPI')
+
+    @staticmethod
+    def get_link(**kwargs) -> str:
+        super().get_link('TransAPI')
+
+    def change_ip(self):
+        self.requester.new_id()
+        log.info("TOR id is changed.")
+        time.sleep(5)
+
+    def make_req(self, link, **kwargs):
+        r = self.requester.get(link, headers=h.generate(), *kwargs)
+        print(r)
+        return r

@@ -51,10 +51,11 @@ class TorProxy(ProxyManager):
         super().__init__([proxy])
 
     @staticmethod
-    def _change_ip(*args):
+    def _change_ip(req_tor, *args):
         log.info("Changing IP...")
-        os.system("sudo service tor restart")
+        req_tor.new_id()
         time.sleep(TOR_RESTART_DELAY)
+
 
 
 class MosTransportBan(Exception):

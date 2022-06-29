@@ -4,7 +4,7 @@ from config import LIMIT_REPEAT
 from db.db import engine
 from models import Stop
 from station import stops_coord
-from api.api import TransAPI, MosTransportBan
+from api.api import TorTransAPI, TransAPI, MosTransportBan
 from api.proxy import FileProxyManager, TorProxy
 from sqlalchemy.orm import sessionmaker
 import threading
@@ -15,12 +15,10 @@ from cl_arguments import parser
 from utils import stops_list_to_queue
 
 log = getLogger()
-
 args = parser.parse_args()
-log.debug(f"Command line args: {args}")
-
 logging.basicConfig(filename="parser.log", format='%(asctime)s %(levelname)s %(message)s ',
                     level=args.loglevel, filemode="a")
+log.debug(f"Command line args: {args}")
 session = sessionmaker(bind=engine)()
 
 
@@ -73,8 +71,7 @@ if __name__ == "__main__":
         file_proxy = FileProxyManager(args.proxy_file)
         api = TransAPI(file_proxy)
     elif args.tor:
-        proxy = TorProxy()
-        api = TransAPI(proxy)
+        api = TorTransAPI()
     else:
         api = TransAPI()
 
