@@ -16,7 +16,6 @@ class TransAPI:
     def __init__(self, proxy_manager=None, requester=req):
         self.requester = requester
         self.proxy_manager = proxy_manager
-        self.counter = 1
 
     @staticmethod
     def get_link(**kwargs) -> str:
@@ -40,7 +39,6 @@ class TransAPI:
             log.debug(f"Get information about station {station_data.get('name')}, ID: {station_data.get('id')}")
             return station_data
         elif kwargs.get("stop_id"):
-            print('we are in')
             stop_id = kwargs["stop_id"]
             link = self.get_link(**kwargs)
             r = self.make_req(link)
@@ -77,25 +75,22 @@ class TransAPI:
 
 
 class TorTransAPI(TransAPI):
-    def __init__(self, proxy_manager=None, requester=None):
+    def __init__(self, proxy_manager=None):
+        self.proxy_manager = proxy_manager
         self.requester = req_tor(tor_ports=(9000, 9001, 9002, 9003, 9004),
                                  tor_cport=9051,
-                                 password=TOR_PASSWORD, autochange_id=PROXY_REUSE)
-        print('tor is being used')
-
-    def get_station_info(self, **kwargs) -> dict:
-        super().get_station_info('TransAPI')
-
-    @staticmethod
-    def get_link(**kwargs) -> str:
-        super().get_link('TransAPI')
+                                 password=TOR_PASSWORD,
+                                 autochange_id=PROXY_REUSE,
+                                 verbose=True)
 
     def change_ip(self):
-        self.requester.new_id()
-        log.info("TOR id is changed.")
-        time.sleep(5)
+        if self.proxy_manager and "_change_ip" in dir(self.proxy_manager):
+            self.proxy_manager._change_ip(self.requester)
+            log.info(f"Ip changed, new ip is {self.get_ip()}")
+        else:
+            log.warning("Trying to change IP but proxymanager didn't selected ot does not allowed to do this")
+            raise MosTransportBan("Trying to change IP but proxymanager is now allowed to do this")
 
     def make_req(self, link, **kwargs):
-        r = self.requester.get(link, headers=h.generate(), *kwargs)
-        print(r)
+        r = self.requester.get(link, *kwargs)
         return r

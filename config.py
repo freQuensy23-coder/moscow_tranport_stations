@@ -31,5 +31,5 @@ headers = {'sec-ch-ua': 'Not;A Brand";v="95", "Google Chrome";v="95", "Chromium"
            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 '
                          'Safari/537.36'} # Headers для запроса
 
-LIMIT_REPEAT = 4 # Максимальное количество запросов на одну остановку
+LIMIT_REPEAT = 5 # Максимальное количество запросов на одну остановку
 DELAY_STOPS = 60 * 6 # Задеркжа перед повторным опросом

@@ -71,7 +71,8 @@ if __name__ == "__main__":
         file_proxy = FileProxyManager(args.proxy_file)
         api = TransAPI(file_proxy)
     elif args.tor:
-        api = TorTransAPI()
+        proxy = TorProxy()
+        api = TorTransAPI(proxy)
     else:
         api = TransAPI()
 
