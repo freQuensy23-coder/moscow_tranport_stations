@@ -31,21 +31,27 @@ class FileProxyManager:
 
     def get_proxy(self, thread_id) -> dict:
         """Метод раздает прокси для каждого нового запроса и меняет адрес после лимита операций"""
+        if self.proxies.empty():
+            raise OutOfProxy()
+
         if thread_id not in self.thread_proxies.keys():
-            self.thread_proxies[thread_id] = (self.proxies.get(), 1)
+            self.thread_proxies[thread_id] = [self.proxies.get(), 1]
             return self.thread_proxies[thread_id][0]
         elif self.thread_proxies[thread_id][1] < PROXY_REUSE:
             self.thread_proxies[thread_id][1] += 1
             return self.thread_proxies[thread_id][0]
         else:
             self.proxies.put(self.thread_proxies[thread_id][0])
-            self.thread_proxies[thread_id] = (self.proxies.get(), 1)
+            self.thread_proxies[thread_id] = [self.proxies.get(), 1]
             return self.thread_proxies[thread_id][0]
 
     def _change_ip(self, thread_id) -> dict:  # TODO добавить удаление прокси из файла
         """Метод меняет адрес и удаляет его из очереди, когда тот попадает в бан"""
-        self.thread_proxies[thread_id] = (self.proxies.get(), 1)
-        return self.thread_proxies[thread_id]
+        if self.proxies.empty():
+            raise OutOfProxy()
+
+        self.thread_proxies[thread_id] = [self.proxies.get(), 1]
+        return self.thread_proxies[thread_id][0]
 
 
 class TorProxy:
@@ -61,4 +67,9 @@ class TorProxy:
 
 class MosTransportBan(Exception):
     """Ваш IP был забанен в мосгортрансе"""
+    pass
+
+
+class OutOfProxy(Exception):
+    """Недостаточно уникальных прокси-адресов для потоков"""
     pass
