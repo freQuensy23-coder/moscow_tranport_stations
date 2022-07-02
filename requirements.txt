@@ -17,6 +17,7 @@ progress==1.6
 progressbar2==4.0.0
 pydantic==1.9.0
 PySocks==1.7.1
+python-dotenv==0.20.0
 python-telegram-bot==13.11
 python-utils==3.1.0
 pytz==2021.3
