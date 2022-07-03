@@ -5,9 +5,20 @@ THREAD_SLEEP = 1 # Задержка потока
 NUM_THREADS = 55 # Количество создаваемы потоков
 STATION_CSV = os.getcwd() + "/stop.csv" # CSV файл с информацией об остановкам по которым делаются запросы
 
-DB_CONNECTION_STRING = f"postgresql://{os.getenv('db_login')}:{os.getenv('db_pass')}" \
-             f"@{os.getenv('db_host')}:{os.getenv('db_port')}/transmetrika" # Параметры БД
-DB_ECHO = True # Выводить ли в консоль SQL запросы
+typeDB = {
+    logging.INFO: 'transmetrika',
+    logging.DEBUG: 'transmetrika_test'
+}
+def getConnectStr(loglevel):
+    return f"postgresql://{os.getenv('db_login')}:{os.getenv('db_pass')}" \
+             f"@{os.getenv('db_host')}:{os.getenv('db_port')}/{typeDB[loglevel]}"
+
+#вместо константы функция
+#DB_CONNECTION_STRING = f"postgresql://{os.getenv('db_login')}:{os.getenv('db_pass')}" \
+#             f"@{os.getenv('db_host')}:{os.getenv('db_port')}/{typeDB[logging.DEBUG]}"
+
+
+DB_ECHO = False # Выводить ли в консоль SQL запросы
 
 
 PROXIES_FILE = "proxy.txt" # файл с прокси по умолчанию
