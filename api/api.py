@@ -100,9 +100,11 @@ class TransAPI:
 
 
 class TorTransAPI(TransAPI):
+    PORTS = [x for x in range(9000, 9010)]
+
     def __init__(self, proxy_manager=None):
         self.proxy_manager = proxy_manager
-        self.requester = req_tor(tor_ports=(9000, 9001, 9002, 9003, 9004),
+        self.requester = req_tor(tor_ports=self.PORTS,
                                  tor_cport=9051,
                                  password=TOR_PASSWORD,
                                  autochange_id=PROXY_REUSE,
@@ -113,8 +115,8 @@ class TorTransAPI(TransAPI):
             self.proxy_manager._change_ip(self.requester)
             log.info(f"Ip changed, new ip is {self.get_ip()}")
         else:
-            log.warning("Trying to change IP but proxymanager didn't selected ot does not allowed to do this")
-            raise MosTransportBan("Trying to change IP but proxymanager is now allowed to do this")
+            log.warning("Trying to change IP but proxymanager didn't selected or does not allowed to do this")
+            raise MosTransportBan("Trying to change IP but proxymanager is not allowed to do this")
 
     def make_req(self, link, **kwargs):
         r = self.requester.get(link, headers=h.generate(), *kwargs)
