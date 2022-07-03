@@ -18,7 +18,7 @@ def getConnectStr(loglevel):
 #             f"@{os.getenv('db_host')}:{os.getenv('db_port')}/{typeDB[logging.DEBUG]}"
 
 
-DB_ECHO = False # Выводить ли в консоль SQL запросы
+DB_ECHO = True # Выводить ли в консоль SQL запросы
 
 
 PROXIES_FILE = "proxy.txt" # файл с прокси по умолчанию
