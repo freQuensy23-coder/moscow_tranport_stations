@@ -1,68 +1,38 @@
-import os
-import queue
-import sys
-import time
-
-import psutil as psutil
-
-from config import LIMIT_REPEAT, DELAY_STOPS
-from db.db import engine
-from models import Stop
-from station import stops_coord
-from api.api import TransAPI, MosTransportBan
-from api.proxy import FileProxyManager, TorProxy
-from sqlalchemy.orm import sessionmaker
-import threading
-from logging import getLogger
-import logging
 from datetime import datetime
+import logging
+from logging import getLogger
+import queue
+import threading
+
+from sqlalchemy.orm import sessionmaker
+
+from api.api import TorTransAPI, TransAPI
+from api.proxy import FileProxyManager, TorProxy
 from cl_arguments import parser
+from db.db import engine
+from station import stops_coord
 from utils import stops_list_to_queue
 
 log = getLogger()
-
 args = parser.parse_args()
-log.debug(f"Command line args: {args}")
-
 logging.basicConfig(filename="parser.log", format='%(asctime)s %(levelname)s %(message)s ',
                     level=args.loglevel, filemode="a")
+log.debug(f"Command line args: {args}")
 session = sessionmaker(bind=engine)()
 
 
 def parser_thread():
     """Поток получает остановки из очереди и занимается их обработкой"""
-    work = True
-    while work:
+    while True:
         try:
             stop_id = stops_queue.get(block=False)
         except queue.Empty:
             log.debug("Finish. Queue is empty.")
-            return None
+            return
         log.debug(f"Thread is working with {stop_id}")
-        station_info = None
-        repeat = 0
-        while station_info is None:
-            repeat += 1
-            if repeat >= LIMIT_REPEAT:  # TODO Вынести всю вот эту логику в API если куча запросов не прошло надо прекращать пытаться
-                log.warning("Unable to get valid station data")
-                raise MosTransportBan("Unable to get valid station data")
-            try:
-                station_info = api.get_station_info(stop_id=stop_id)
-                log.debug(f"Parsing station info: {station_info}")
-                stop = Stop.parse_obj(station_info)
-            except MosTransportBan:
-                log.warning("Changing ip")
-                api.change_ip()
-            except Exception as e:
-                log.exception(e)
-                log.warning(f"{e}")
-                log.warning("Changing ip..")
-                api.change_ip()
-                station_info = None
 
-        stop.save_forecast(session, commit=False) # TODO
-    log.debug("Thread finish working")
-    return None
+        api.thread_runner(stop_id, session)
+
 
 def wait_for_threads():
     global stops_list, NUM_THREADS, stops_queue, threads
@@ -79,7 +49,7 @@ if __name__ == "__main__":
         api = TransAPI(file_proxy)
     elif args.tor:
         proxy = TorProxy()
-        api = TransAPI(proxy)
+        api = TorTransAPI(proxy)
     else:
         api = TransAPI()
 
@@ -101,4 +71,3 @@ if __name__ == "__main__":
     wait_for_threads()
     session.commit()
     log.info("Done!")
-

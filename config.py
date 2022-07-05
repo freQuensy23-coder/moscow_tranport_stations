@@ -1,5 +1,8 @@
 import logging
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 THREAD_SLEEP = 1 # Задержка потока
 NUM_THREADS = 55 # Количество создаваемы потоков
@@ -20,9 +23,13 @@ def getConnectStr(loglevel):
 
 DB_ECHO = True # Выводить ли в консоль SQL запросы
 
+TOR_PASSWORD = os.getenv('tor_password')
 
-PROXIES_FILE = "proxy.txt" # файл с прокси по умолчанию
-TOR_RESTART_DELAY: int = 10 # задержка после перезагружки сервиса тор
+
+PROXIES_FILE = "proxy.txt"  # файл с прокси по умолчанию
+TOR_RESTART_DELAY = 5  # задержка после перезагружки сервиса тор
+PROXY_REUSE = 5  # использовать прокси N раз
+LIMIT_REPEAT = 5 # Максимальное количество запросов на одну остановку
 
 LEVEL = logging.INFO # Уровень логгирования в обычном режими
 TIME_LIMIT = 9 * 60  # 9 min Лимит времени работы программы
@@ -36,5 +43,4 @@ headers = {'sec-ch-ua': 'Not;A Brand";v="95", "Google Chrome";v="95", "Chromium"
            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 '
                          'Safari/537.36'} # Headers для запроса
 
-LIMIT_REPEAT = 4 # Максимальнео количество запросов на одну остановку
 DELAY_STOPS = 60 * 6 # Задеркжа перед повторным опросом

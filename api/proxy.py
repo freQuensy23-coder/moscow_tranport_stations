@@ -45,15 +45,13 @@ class FileProxyManager(ProxyManager):
 
 
 class TorProxy(ProxyManager):
-    def __init__(self, port=9050, ip='127.0.0.1'):
-        proxy = {'https': f'socks5://{ip}:{port}',
-                 'http': f'socks5://{ip}:{port}'}
-        super().__init__([proxy])
+    def __init__(self):
+        pass
 
     @staticmethod
-    def _change_ip(*args):
+    def _change_ip(req_tor, *args):
         log.info("Changing IP...")
-        os.system("sudo service tor restart")
+        req_tor.new_id()
         time.sleep(TOR_RESTART_DELAY)
 
 
