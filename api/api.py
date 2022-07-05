@@ -81,8 +81,8 @@ class TransAPI:
 
     def change_ip(self):
         """Меняет прокси IP."""
-        if self.proxy_manager and "_change_ip" in dir(self.proxy_manager):
-            self.proxy_manager._change_ip(threading.get_ident())
+        if self.proxy_manager and "change_proxy" in dir(self.proxy_manager):
+            self.proxy_manager.change_proxy(threading.get_ident())
             log.info(f"Ip changed, new ip is {self.get_ip()}")
         else:
             log.warning("Trying to change IP but proxymanager didn't selected or does not allowed to do this")
@@ -111,8 +111,8 @@ class TorTransAPI(TransAPI):
                                  verbose=True)
 
     def change_ip(self):
-        if self.proxy_manager and "_change_ip" in dir(self.proxy_manager):
-            self.proxy_manager._change_ip(self.requester)
+        if self.proxy_manager and "change_proxy" in dir(self.proxy_manager):
+            self.proxy_manager.change_proxy(self.requester)
             log.info(f"Ip changed, new ip is {self.get_ip()}")
         else:
             log.warning("Trying to change IP but proxymanager didn't selected or does not allowed to do this")

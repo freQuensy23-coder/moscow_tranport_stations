@@ -1,4 +1,3 @@
-import os
 import time
 from random import shuffle
 from multiprocessing import Queue
@@ -10,9 +9,8 @@ log = getLogger(name="ProxyManagers")
 
 
 class FileProxyManager:
-    """
-    Менеджер для проксей из файла
-    """
+    """Менеджер для проксей из файла"""
+
     def __init__(self, file_name):
         """Создаем из списка адресов многопотоковую очередь, чтобы адреса распределялись между потоками"""
         self.proxies = Queue()
@@ -33,21 +31,21 @@ class FileProxyManager:
         """Метод раздает прокси для каждого нового запроса и меняет адрес после лимита операций"""
         if self.proxies.empty():
             raise EmptyProxyQueue()
-                                                                           
+
         if thread_id not in self.thread_proxies.keys():
             self.thread_proxies[thread_id] = [self.proxies.get(), 1]
-            self.proxies.put(self.thread_proxies[thread_id][0])                                                                                      
+            self.proxies.put(self.thread_proxies[thread_id][0])
             return self.thread_proxies[thread_id][0]
         elif self.thread_proxies[thread_id][1] < PROXY_REUSE:
-            self.thread_proxies[thread_id][1] += 1                               
+            self.thread_proxies[thread_id][1] += 1
             return self.thread_proxies[thread_id][0]
         else:
-            #self.proxies.put(self.thread_proxies[thread_id][0])
+            # self.proxies.put(self.thread_proxies[thread_id][0])
             self.thread_proxies[thread_id] = [self.proxies.get(), 1]
             self.proxies.put(self.thread_proxies[thread_id][0])
             return self.thread_proxies[thread_id][0]
 
-    def _change_ip(self, thread_id) -> dict:  # TODO добавить удаление прокси из файла
+    def change_proxy(self, thread_id) -> dict:  # TODO добавить удаление прокси из файла
         """Метод меняет адрес и удаляет его из очереди, когда тот попадает в бан"""
         if self.proxies.empty():
             raise EmptyProxyQueue()
@@ -57,12 +55,12 @@ class FileProxyManager:
         return self.thread_proxies[thread_id][0]
 
 
-class TorProxy:
+class TorProxyManager:
     def __init__(self):
         pass
 
     @staticmethod
-    def _change_ip(req_tor):
+    def change_proxy(req_tor):
         log.info("Changing IP...")
         req_tor.new_id()
         time.sleep(TOR_RESTART_DELAY)

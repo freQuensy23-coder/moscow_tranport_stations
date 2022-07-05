@@ -7,7 +7,7 @@ import threading
 from sqlalchemy.orm import sessionmaker
 
 from api.api import TorTransAPI, TransAPI
-from api.proxy import FileProxyManager, TorProxy
+from api.proxy import FileProxyManager, TorProxyManager
 from cl_arguments import parser
 from db.db import engine
 from station import stops_coord
@@ -48,7 +48,7 @@ if __name__ == "__main__":
         file_proxy = FileProxyManager(args.proxy_file)
         api = TransAPI(file_proxy)
     elif args.tor:
-        proxy = TorProxy()
+        proxy = TorProxyManager()
         api = TorTransAPI(proxy)
     else:
         api = TransAPI()
