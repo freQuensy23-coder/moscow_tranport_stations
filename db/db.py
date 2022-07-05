@@ -1,17 +1,10 @@
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy import create_engine
+from cl_arguments import parser
+from config import DB_ECHO, getConnectStr
 
-import sys
-import os
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-
-from config import DB_CONNECTION_STRING, DB_ECHO
-
-
-engine = create_engine(DB_CONNECTION_STRING, echo=DB_ECHO,
+engine = create_engine(getConnectStr(parser.parse_args().loglevel), echo=DB_ECHO,
                        pool_size=10,
                        max_overflow=2,
                        pool_recycle=300,
