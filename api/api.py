@@ -5,8 +5,8 @@ import requests as req
 from fake_headers import Headers
 from requests_tor import RequestsTor as req_tor
 
-from api.proxy import MosTransportBan
-from config import PROXY_REUSE, TOR_PASSWORD, LIMIT_REPEAT
+from proxy import MosTransportBan
+from config import PROXY_REUSE, TOR_PASSWORD, LIMIT_REPEAT, NUM_THREADS
 from models import Stop
 
 log = logging.getLogger("TransAPI")
@@ -56,7 +56,7 @@ class TransAPI:
             link = self.get_link(**kwargs)
             r = self.make_req(link)
             if r.content == b"":
-                log.warning(f"Banned in MGT. Current ip is {self.get_ip()}")
+                log.warning(f"Banned in MGT. Current ip is {self.current_ip()}")
                 raise MosTransportBan("You have been banned")
             station_data = r.json()
             log.debug(f"API get station data {station_data} for station {(lon, lat)}. Link = {link}")
@@ -66,24 +66,22 @@ class TransAPI:
             link = self.get_link(**kwargs)
             r = self.make_req(link)
             if r.content == b"":
-                log.warning(f"Banned in MGT. Current ip is {self.get_ip()}")
+                log.warning(f"Banned in MGT. Current ip is {self.current_ip()}")
                 raise MosTransportBan("You have been banned")
             station_data = r.json()
             log.debug(f"API get station data {station_data} for station {stop_id}. Link = {link}")
             log.debug(f"Get information about station {station_data.get('name')}, ID: {station_data.get('stop_id')}")
         return station_data
 
-    def get_ip(self):
-        # link = "https://ifconfig.me/ip"
-        # r = self.make_req(link)
-        # return r.content
-        return "11"
+    def current_ip(self):
+        r = self.make_req('https://api.ipify.org')
+        return r.content
 
     def change_ip(self):
         """Меняет прокси IP."""
-        if self.proxy_manager and "_change_ip" in dir(self.proxy_manager):
-            self.proxy_manager._change_ip(threading.get_ident())
-            log.info(f"Ip changed, new ip is {self.get_ip()}")
+        if self.proxy_manager and "change_proxy" in dir(self.proxy_manager):
+            self.proxy_manager.change_proxy(threading.get_ident())
+            log.info(f"Ip changed, new ip is {self.current_ip()}")
         else:
             log.warning("Trying to change IP but proxymanager didn't selected or does not allowed to do this")
             raise MosTransportBan("Trying to change IP but proxymanager is not allowed to do this")
@@ -100,9 +98,14 @@ class TransAPI:
 
 
 class TorTransAPI(TransAPI):
-    PORTS = [x for x in range(9000, 9010)]
-
     def __init__(self, proxy_manager=None):
+        if NUM_THREADS <= 50:
+            self.PORTS = [i for i in range(9000, 9000 + NUM_THREADS)]
+            log.info(f'Using {len(self.PORTS)} SOCKS proxy addresses')
+        else:
+            self.PORTS = [i for i in range(9000, 9049)]
+            log.info(f'Number of threads exceeds number of SOCKS ports. Using {len(self.PORTS)} unique addresses instead')
+
         self.proxy_manager = proxy_manager
         self.requester = req_tor(tor_ports=self.PORTS,
                                  tor_cport=9051,
@@ -111,9 +114,9 @@ class TorTransAPI(TransAPI):
                                  verbose=True)
 
     def change_ip(self):
-        if self.proxy_manager and "_change_ip" in dir(self.proxy_manager):
-            self.proxy_manager._change_ip(self.requester)
-            log.info(f"Ip changed, new ip is {self.get_ip()}")
+        if self.proxy_manager and "change_proxy" in dir(self.proxy_manager):
+            self.proxy_manager.change_proxy(self.requester)
+            log.info(f"Ip changed, new ip is {self.current_ip()}")
         else:
             log.warning("Trying to change IP but proxymanager didn't selected or does not allowed to do this")
             raise MosTransportBan("Trying to change IP but proxymanager is not allowed to do this")
