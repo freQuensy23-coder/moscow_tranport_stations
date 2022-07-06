@@ -5,7 +5,7 @@ import requests as req
 from fake_headers import Headers
 from requests_tor import RequestsTor as req_tor
 
-from proxy import MosTransportBan
+from .proxy import MosTransportBan
 from config import PROXY_REUSE, TOR_PASSWORD, LIMIT_REPEAT, NUM_THREADS
 from models import Stop
 
