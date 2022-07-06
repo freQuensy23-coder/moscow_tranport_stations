@@ -25,11 +25,13 @@ def parser_thread():
     """Поток получает остановки из очереди и занимается их обработкой"""
     while True:
         try:
+            log.debug(f'{stops_queue.unfinished_tasks=}')
             stop_id = stops_queue.get(block=False)
+            stops_queue.task_done()
         except queue.Empty:
-            log.debug("Finish. Queue is empty.")
+            log.debug(f"Finish. Queue is empty. Thread {threading.current_thread().name}")
             return
-        log.debug(f"Thread is working with {stop_id}")
+        log.debug(f"Thread {threading.current_thread().name} is working with {stop_id}")
 
         api.thread_runner(stop_id, session)
 

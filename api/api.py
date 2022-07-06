@@ -74,8 +74,9 @@ class TransAPI:
         return station_data
 
     def current_ip(self):
-        r = self.make_req('https://api.ipify.org')
-        return r.content
+        # r = self.make_req('https://api.ipify.org')
+        # return r.content
+        pass
 
     def change_ip(self):
         """Меняет прокси IP."""
@@ -103,7 +104,7 @@ class TorTransAPI(TransAPI):
             self.PORTS = [i for i in range(9000, 9000 + NUM_THREADS)]
             log.info(f'Using {len(self.PORTS)} SOCKS proxy addresses')
         else:
-            self.PORTS = [i for i in range(9000, 9049)]
+            self.PORTS = [i for i in range(9000, 9050)]
             log.info(f'Number of threads exceeds number of SOCKS ports. Using {len(self.PORTS)} unique addresses instead')
 
         self.proxy_manager = proxy_manager
