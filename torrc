@@ -76,5 +76,4 @@ ControlPort 9051
 
 ## where your password is my_password
 ## don't forget to paste the password to .env
-
-HashedControlPassword 
+## HashedControlPassword 
