@@ -5,7 +5,7 @@ import requests as req
 from fake_headers import Headers
 from requests_tor import RequestsTor as req_tor
 
-from .proxy import MosTransportBan
+from api.proxy import MosTransportBan
 from config import PROXY_REUSE, TOR_PASSWORD, LIMIT_REPEAT, NUM_THREADS
 from models import Stop
 
@@ -99,9 +99,9 @@ class TransAPI:
 
 
 class TorTransAPI(TransAPI):
-    def __init__(self, proxy_manager=None):
-        if NUM_THREADS <= 50:
-            self.PORTS = [i for i in range(9000, 9000 + NUM_THREADS)]
+    def __init__(self, proxy_manager=None, num_threads=NUM_THREADS):
+        if num_threads <= 50:
+            self.PORTS = [i for i in range(9000, 9000 + num_threads)]
             log.info(f'Using {len(self.PORTS)} SOCKS proxy addresses')
         else:
             self.PORTS = [i for i in range(9000, 9050)]
