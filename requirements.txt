@@ -35,3 +35,4 @@ tzdata==2021.5
 tzlocal==4.1
 urllib3==1.26.8
 webencodings==0.5.1
+pandas==1.4.3
