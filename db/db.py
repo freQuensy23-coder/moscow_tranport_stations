@@ -1,8 +1,14 @@
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, Integer, String, Float
+import pandas as pd
+
+from time import time
+from itertools import combinations
+
 from sqlalchemy import create_engine
-from cl_arguments import parser
+from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy.orm import declarative_base
+
 from config import DB_ECHO, getConnectStr
+from cl_arguments import parser
 
 engine = create_engine(getConnectStr(parser.parse_args().loglevel), echo=DB_ECHO,
                        pool_size=10,
@@ -39,6 +45,40 @@ class Stop(Base):
 
     lon = Column(Float)
     lat = Column(Float)
+
+
+class Cleaner:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def get_cleaned():
+        start = time()
+        df = pd.read_sql_table('prediction_data', 'sqlite:///db/test.db', index_col='id')
+        df_cleaned = pd.DataFrame(columns=df.columns)
+
+        for stop in df['stop_id'].unique():
+            for route in df[df['stop_id'] == stop]['routePathId'].unique():
+                for bus in df[(df['stop_id'] == stop) &
+                              (df['routePathId'] == route)]['tmId'].unique():
+                    rows = df[
+                        (df['stop_id'] == stop) &
+                        (df['routePathId'] == route) &
+                        (df['tmId'] == bus)]
+
+                    pairs = combinations(rows.index, 2)
+
+                    for pair in pairs:
+                        if abs(int(df.loc[pair[0], :]['forecast_time']) -
+                               int(df.loc[pair[1], :]['forecast_time'])) < 600:
+                            if int(df.loc[pair[0], :]['request_time']) < int(df.loc[pair[1], :]['request_time']):
+                                pd.concat(df_cleaned, df.loc[pair[0], :])
+                            else:
+                                pd.concat([df_cleaned, df.loc[pair[1], :]])
+
+        df_cleaned.drop_duplicates(inplace=True)
+        print(f'Elapsed: {time() - start} seconds')
+        return df_cleaned
 
 
 Base.metadata.create_all(engine)
