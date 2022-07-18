@@ -11,7 +11,12 @@ from sqlalchemy.orm import declarative_base
 from config import DB_ECHO, getConnectStr
 from cl_arguments import parser
 
-engine = create_engine('sqlite:///db/test.db')
+engine = create_engine(getConnectStr(parser.parse_args().loglevel), echo=DB_ECHO,
+                       pool_size=10,
+                       max_overflow=2,
+                       pool_recycle=300,
+                       pool_pre_ping=True,
+                       pool_use_lifo=True)
 Base = declarative_base()
 
 
