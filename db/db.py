@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from time import time
@@ -10,12 +11,7 @@ from sqlalchemy.orm import declarative_base
 from config import DB_ECHO, getConnectStr
 from cl_arguments import parser
 
-engine = create_engine(getConnectStr(parser.parse_args().loglevel), echo=DB_ECHO,
-                       pool_size=10,
-                       max_overflow=2,
-                       pool_recycle=300,
-                       pool_pre_ping=True,
-                       pool_use_lifo=True)
+engine = create_engine('sqlite:///db/test.db')
 Base = declarative_base()
 
 
@@ -55,7 +51,7 @@ class Cleaner:
     def get_cleaned():
         start = time()
         df = pd.read_sql_table('prediction_data', 'sqlite:///db/test.db', index_col='id')
-        df_cleaned = pd.DataFrame(columns=df.columns)
+        data_cleaned = np.array(df.columns)
 
         for stop in df['stop_id'].unique():
             for route in df[df['stop_id'] == stop]['routePathId'].unique():
@@ -72,11 +68,13 @@ class Cleaner:
                         if abs(int(df.loc[pair[0], :]['forecast_time']) -
                                int(df.loc[pair[1], :]['forecast_time'])) < 600:
                             if int(df.loc[pair[0], :]['request_time']) < int(df.loc[pair[1], :]['request_time']):
-                                pd.concat(df_cleaned, df.loc[pair[0], :])
+                                data_cleaned = np.vstack((data_cleaned, df.loc[pair[0], :].values))
                             else:
-                                pd.concat([df_cleaned, df.loc[pair[1], :]])
+                                data_cleaned = np.vstack((data_cleaned, df.loc[pair[0], :].values))
 
+        df_cleaned = pd.DataFrame(data_cleaned[1:], columns=data_cleaned[0])
         df_cleaned.drop_duplicates(inplace=True)
+
         print(f'Elapsed: {time() - start} seconds')
         return df_cleaned
 
