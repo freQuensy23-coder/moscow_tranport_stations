@@ -55,7 +55,7 @@ class Cleaner:
     @staticmethod
     def get_cleaned():
         start = time()
-        df = pd.read_sql_table('prediction_data', 'sqlite:///db/test.db', index_col='id')
+        df = pd.read_sql_table('prediction_data', getConnectStr(parser.parse_args().loglevel), index_col='id')
         data_cleaned = np.array(df.columns)
 
         for stop in df['stop_id'].unique():
@@ -70,12 +70,12 @@ class Cleaner:
                     pairs = combinations(rows.index, 2)
 
                     for pair in pairs:
-                        if abs(int(df.loc[pair[0], :]['forecast_time']) -
-                               int(df.loc[pair[1], :]['forecast_time'])) < 600:
-                            if int(df.loc[pair[0], :]['request_time']) < int(df.loc[pair[1], :]['request_time']):
-                                data_cleaned = np.vstack((data_cleaned, df.loc[pair[0], :].values))
+                        row1, row2 = df.loc[pair[0], :], df.loc[pair[1], :]
+                        if abs(int(row1['forecast_time']) - int(row2['forecast_time'])) < 600:
+                            if int(row1['request_time']) < int(row2['request_time']):
+                                data_cleaned = np.vstack((data_cleaned, row1.values))
                             else:
-                                data_cleaned = np.vstack((data_cleaned, df.loc[pair[0], :].values))
+                                data_cleaned = np.vstack((data_cleaned, row2.values))
 
         df_cleaned = pd.DataFrame(data_cleaned[1:], columns=data_cleaned[0])
         df_cleaned.drop_duplicates(inplace=True)
