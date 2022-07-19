@@ -1,8 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from time import time
-from itertools import combinations
+from time import time, asctime
 
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, Float
@@ -53,34 +52,53 @@ class Cleaner:
         pass
 
     @staticmethod
-    def get_cleaned():
-        start = time()
+    def get_csv(file='db.csv'):
+        print('Fetching DB...')
         df = pd.read_sql_table('prediction_data', getConnectStr(parser.parse_args().loglevel), index_col='id')
+        print('DB fetched')
+        df.to_csv(file)
+
+    @staticmethod
+    def get_cleaned(read_from=None, write_to=None):
+        if read_from is not None:
+            df = pd.read_csv(read_from, header=0)
+        else:
+            print('Fetching DB...')
+            df = pd.read_sql_table('prediction_data', getConnectStr(parser.parse_args().loglevel))
+            print('DB fetched')
+            if write_to is not None:
+                df.to_csv(write_to, index=False)
+
+        start = time()
+        print(f'\nCleaner started at: {asctime()}')
+
         data_cleaned = np.array(df.columns)
+        i = 0
 
         for stop in df['stop_id'].unique():
             for route in df[df['stop_id'] == stop]['routePathId'].unique():
                 for bus in df[(df['stop_id'] == stop) &
                               (df['routePathId'] == route)]['tmId'].unique():
-                    rows = df[
+                    dups = df[
                         (df['stop_id'] == stop) &
                         (df['routePathId'] == route) &
-                        (df['tmId'] == bus)]
+                        (df['tmId'] == bus)].sort_values('request_time', ascending=False)
 
-                    pairs = combinations(rows.index, 2)
+                    data_cleaned = np.vstack((data_cleaned, dups.to_numpy()[0, :]))
 
-                    for pair in pairs:
-                        row1, row2 = df.loc[pair[0], :], df.loc[pair[1], :]
-                        if abs(int(row1['forecast_time']) - int(row2['forecast_time'])) < 600:
-                            if int(row1['request_time']) < int(row2['request_time']):
-                                data_cleaned = np.vstack((data_cleaned, row1.values))
-                            else:
-                                data_cleaned = np.vstack((data_cleaned, row2.values))
+                    for idx, dup in dups.iloc[1:, :].iterrows():
+                        if dup['forecast_time'] - data_cleaned[-1, 3] > 600:
+                            data_cleaned = np.vstack((data_cleaned, dup.to_numpy()))
+                        i += 1
+                        if i % 1000 == 0:
+                            elapsed = (time() - start) / 60
+                            print(f'{i:,} items handled, {elapsed:.2f} min elapsed,')
 
         df_cleaned = pd.DataFrame(data_cleaned[1:], columns=data_cleaned[0])
         df_cleaned.drop_duplicates(inplace=True)
 
-        print(f'Elapsed: {time() - start} seconds')
+        elapsed = (time() - start) / 60
+        print(f'Cleaner finished at: {asctime()}\n{elapsed:.2f} min elapsed.')
         return df_cleaned
 
 
