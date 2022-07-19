@@ -1,7 +1,7 @@
 import signal
-import time
 from contextlib import contextmanager
-from multiprocessing import Queue
+# from multiprocessing import Queue
+from queue import Queue
 
 
 def stops_list_to_queue(data: list, queue: Queue = None) -> Queue:
