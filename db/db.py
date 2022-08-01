@@ -72,6 +72,7 @@ class Cleaner:
         start = time()
         print(f'\nCleaner started at: {asctime()}')
 
+        df = df[df['byTelemetry'] == 1]
         data_cleaned = np.array(df.columns)
         i = 0
 
@@ -87,7 +88,7 @@ class Cleaner:
                     data_cleaned = np.vstack((data_cleaned, dups.to_numpy()[0, :]))
 
                     for idx, dup in dups.iloc[1:, :].iterrows():
-                        if dup['forecast_time'] - data_cleaned[-1, 3] > 600:
+                        if abs(dup['forecast_time'] - data_cleaned[-1, 3]) > 1200:
                             data_cleaned = np.vstack((data_cleaned, dup.to_numpy()))
                         i += 1
                         if i % 1000 == 0:
