@@ -22,3 +22,8 @@ site: transmetrica.com
 * `--tor` - использовать tor. У вас он должен быть уже установлен
 
 Для корректной работы с Postgres (вместо sqlite) нужно указать в параметрах окружения db-login db-host db-pass db-port - данные для доступа к удаленной базе данных. Название базы данных - transmetrika. Во время первого запуска нужо запустить файл db/db.py для создания таблиц.
+
+# Результаты работы
+![https://github.com/freQuensy23-coder/moscow_tranport_stations/blob/0e0074d83665e8cf344feb055677234f55c92837/photo_2023-01-24_14-58-54.jpg](https://github.com/freQuensy23-coder/moscow_tranport_stations/blob/0e0074d83665e8cf344feb055677234f55c92837/photo_2023-01-24_14-58-54.jpg)
+
+![](https://github.com/freQuensy23-coder/moscow_tranport_stations/blob/0e0074d83665e8cf344feb055677234f55c92837/photo_2023-01-24_14-59-20.jpg)
